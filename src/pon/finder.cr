@@ -1,4 +1,4 @@
-module Pon::Read(T, P)
+module Pon::Finder(T, P)
   macro included
     def self.count
       adapter.count(table_name)

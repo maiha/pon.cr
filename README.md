@@ -53,6 +53,7 @@ job.time? # => nil
 ## Roadmap
 
 - Adapter Core
+  - [x] connect lazily
   - [x] exec plain sql
   - [ ] exec prepared statement
   - [x] count
@@ -67,8 +68,10 @@ job.time? # => nil
   - [x] pluralize table names
   - [ ] custom type
   - [ ] multibytes
-  - [ ] record states
+  - [ ] record status
   - [ ] inspect class and records
+  - [ ] callbacks
+  - [ ] validations
 - CRUD
   - [ ] all
   - [x] count
@@ -93,3 +96,9 @@ TODO: Write development instructions here
 ## Contributors
 
 - [maiha](https://github.com/maiha) maiha - creator, maintainer
+
+## Thanks / Inspiration
+
+* [crecto](https://github.com/Crecto/crecto)
+* [AciveRecord](https://github.com/rails/rails/tree/master/activerecord)
+* [active_record.cr](https://github.com/waterlink/active_record.cr)

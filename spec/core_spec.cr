@@ -1,17 +1,23 @@
 require "./spec_helper"
 
-private class Mutibyte < Pon::Model
+private class Multibyte < Pon::Model
   adapter mysql
   field   v : String
 end
 
 describe "Core" do
   it "(setup)" do
-    Mutibyte.migrate!
+    Multibyte.migrate!
+  end
+
+  describe ".table_name" do
+    it "should be pluralized with downcase" do
+      Multibyte.table_name.should eq("multibytes")
+    end
   end
   
-  pending "supports multibytes" do
-    r = Mutibyte.create(v: "まいは")
+  it "supports multibytes" do
+    r = Multibyte.create(v: "まいは")
     r.v.should eq("まいは")
   end
 end

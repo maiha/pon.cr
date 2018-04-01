@@ -12,6 +12,15 @@ module Pon::Cast
     end
   end
 
+  def cast(value, type : Int64.class)
+    case value
+    when Int32 ; value.as(Int32).to_i64
+    when Int64 ; value.to_i64
+    when String; value.to_i64(strict: false)
+    else       ;  raise ArgumentError.new("cast error: #{type} <= '#{value}'")
+    end
+  end
+
   def cast(value, type : String.class)
     value.to_s
   end

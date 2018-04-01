@@ -63,15 +63,11 @@ class Pon::Adapter::Mysql(T) < Pon::Adapter::DB(T)
       stmt << ")"
     end
 
-    log statement, params
-
-    open do |db|
-      db.exec statement, params
-      if lastval
-        return db.scalar(last_val()).as(Int64)
-      else
-        return -1_i64
-      end
+    exec statement, params
+    if lastval
+      return scalar(last_val()).as(Int64)
+    else
+      return -1_i64
     end
   end
 
@@ -87,11 +83,7 @@ class Pon::Adapter::Mysql(T) < Pon::Adapter::DB(T)
       stmt << " WHERE #{quote(primary_name)}=?"
     end
 
-    log statement, params
-
-    open do |db|
-      db.exec statement, params
-    end
+    exec statement, params
   end
 
   # This will delete a row from the database.

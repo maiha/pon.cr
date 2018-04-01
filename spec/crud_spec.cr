@@ -7,7 +7,7 @@ private class Job < Pon::Model
   field   time : Time::Span
 end
 
-describe Pon::Model do
+describe "CRUD" do
   it "(setup)" do
     Job.migrate!
   end
@@ -24,6 +24,17 @@ describe Pon::Model do
       job.id?.should eq(nil)
       job.name.should eq("foo")
       job.time?.should eq(nil)
+    end
+  end
+
+  describe ".save" do
+    it "works" do
+      Job.count.should eq(0)
+
+      job = Job.new(name: "foo")
+      job.save.should be_true
+
+      Job.count.should eq(1)
     end
   end
 end

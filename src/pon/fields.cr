@@ -48,7 +48,7 @@ module Pon::Fields
       end
     {% end %}
 
-    @@table_name : String = LuckyInflector::Inflector.tableize({{ SETTINGS[:table_name] || @type.name.id }}).gsub("/","_")
+    @@table_name : String = LuckyInflector::Inflector.tableize({{ SETTINGS[:table_name] || @type.name.id.stringify }}).gsub("/","_")
     def self.table_name
       @@table_name
     end
@@ -72,6 +72,22 @@ module Pon::Fields
       @@field_names ||= {{ ALL_FIELDS.values.map{|h| h[:name]} }}
     end
 
+    def self.content_field_names : Array(String)
+      @@content_field_names ||= {{ CONTENT_FIELDS.keys.map(&.stringify) }}
+    end
+
+    def content_values
+      parsed_params = [] of Types
+      {% for name, type in CONTENT_FIELDS %}
+        {% if type.id == Time.id %}
+          parsed_params << {{name.id}}?.try(&.to_s("%F %X"))
+        {% else %}
+          parsed_params << {{name.id}}?
+        {% end %}
+      {% end %}
+      return parsed_params
+    end
+    
     def self.get?(id : {{primary_type}}) : {{@type}}?
       fields = field_names
       clause = ""
