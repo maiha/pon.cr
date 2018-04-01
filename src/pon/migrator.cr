@@ -6,7 +6,7 @@
 #   field name : String
 # end
 #
-# User.migrator.drop_and_create
+# User.migrator.migrate!
 # # => "DROP TABLE IF EXISTS `users`;"
 # # => "CREATE TABLE `users` (id BIGSERIAL PRIMARY KEY, name VARCHAR(255));"
 #
@@ -33,16 +33,15 @@ module Pon::Migrator
     end
   end
 
-  macro _generate_migrator
+  macro _finish_migrator
     {% primary_name = PRIMARY[:name] %}
     {% primary_type = PRIMARY[:type] %}
     {% primary_auto = PRIMARY[:auto] %}
-    {% klass = @type.name %}
-    {% adapter = "#{klass}.adapter".id %}
+    {% adapter = "#{@type.name}.adapter".id %}
     
     class Migrator < Pon::Migrator::Base
       private def exec(*args)
-        {{klass}}.adapter.exec(*args)
+        {{adapter}}.exec(*args)
       end
 
       def drop

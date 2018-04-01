@@ -8,7 +8,7 @@ class Pon::Model
   macro inherited
     macro finished
       _finish_fields
-      _generate_migrator
+      _finish_migrator
 
       include Pon::Validations(Types, {{PRIMARY[:type]}})
       include Pon::Persistence(Types, {{PRIMARY[:type]}})

@@ -50,6 +50,27 @@ job.time? # => nil
 # job.save # TODO
 ```
 
+## API
+
+```
+class Pon::Model
+  # Databases
+  def self.adapter : Adapter(T)
+  def self.migrator : Migrator
+  def self.migrate! : Nil
+  def self.exec(sql) : Nil
+  def self.table_name : String
+  def self.quote(v) : String
+
+  # CRUD
+  def self.count : Int32
+  def save : Bool
+
+  # Field "foo"
+  def foo : T
+  def foo? : T?
+```
+
 ## Roadmap
 
 - Adapter Core
