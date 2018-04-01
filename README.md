@@ -41,12 +41,42 @@ end
 Pon::Adapter::Mysql::DEFAULT.url = "mysql://root@127.0.0.1:3306/test"
 Job.migrate!  # drop and create the table
 
+Job.count # => 0
+
 job = Job.new(name: "foo")
 job.name  # => "foo"
 job.time? # => nil
 
 # job.save # TODO
 ```
+
+## Roadmap
+
+- Adapter Core
+  - [x] exec plain sql
+  - [ ] exec prepared statement
+  - [x] count
+  - [ ] scalar
+  - [x] quote
+  - [x] migrator
+- Adapter Drivers
+  - [x] mysql
+  - [ ] pg
+  - [ ] sqlite
+- Core
+  - [x] pluralize table names
+  - [ ] custom type
+  - [ ] multibytes
+  - [ ] record states
+  - [ ] inspect class and records
+- CRUD
+  - [ ] all
+  - [x] count
+  - [ ] create
+  - [ ] delete
+  - [ ] find
+  - [ ] save
+
 
 ## Development
 

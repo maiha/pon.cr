@@ -29,12 +29,6 @@ module Pon::Fields
     {% CONTENT_FIELDS[decl.var] = {name: decl.var, type: decl.type} %}
   end
 
-  # include created_at and updated_at that will automatically be updated
-  macro timestamps
-    field created_at : Time
-    field updated_at : Time
-  end
-
   macro _finish_fields
     {% primary_name = PRIMARY[:name] %}
     {% primary_type = PRIMARY[:type] %}
@@ -54,12 +48,7 @@ module Pon::Fields
       end
     {% end %}
 
-    {% all_type = ALL_FIELDS.values.map{|h| h[:type].stringify}.sort.join("|").id %}
-
-    {% name_space = @type.name.gsub(/::/, "_").underscore.id %}
-    {% table_name = SETTINGS[:table_name] || name_space + "s" %}
-
-    @@table_name = "{{table_name}}"
+    @@table_name : String = LuckyInflector::Inflector.tableize({{ SETTINGS[:table_name] || @type.name.id }}).gsub("/","_")
     def self.table_name
       @@table_name
     end
