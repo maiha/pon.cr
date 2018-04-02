@@ -7,7 +7,7 @@ end
 
 private class Multibyte2 < Pon::Model
   adapter mysql
-  table_name "mb2"
+  table_name "test.mb2"
 end
 
 describe "Core" do
@@ -21,7 +21,17 @@ describe "Core" do
     end
 
     it "should be settable" do
-      Multibyte2.table_name.should eq("mb2")
+      Multibyte2.table_name.should eq("test.mb2")
+    end
+  end
+
+  describe ".quoted_table_name" do
+    it "should quote with backtick" do
+      Multibyte.quoted_table_name.should eq("`multibytes`")
+    end
+
+    it "should be settable" do
+      Multibyte2.quoted_table_name.should eq("`test.mb2`")
     end
   end
 

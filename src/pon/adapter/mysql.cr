@@ -15,10 +15,6 @@ class Pon::Adapter::Mysql < Pon::Adapter::DB
     }
   end
 
-  def truncate(table_name)
-    exec "TRUNCATE #{quote(table_name)}"
-  end
-
   # select performs a query against a table.  The table_name and fields are
   # configured using the sql_mapping directive in your model.  The clause and
   # params is the query and params that is passed in via .all() method
@@ -84,17 +80,6 @@ class Pon::Adapter::Mysql < Pon::Adapter::DB
     end
 
     exec statement, params
-  end
-
-  # This will delete a row from the database.
-  def delete(table_name, primary_name, value)
-    statement = "DELETE FROM #{quote(table_name)} WHERE #{quote(primary_name)}=?"
-
-    log statement, value
-
-    open do |db|
-      db.exec statement, value
-    end
   end
 
   Adapters["mysql"] = self.as(Adapter.class)

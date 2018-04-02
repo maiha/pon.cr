@@ -21,8 +21,11 @@ abstract class Pon::Adapter::DB < Pon::Adapter
   end
 
   def count(table_name : String) : Int32
-    quoted_table_name = quote(table_name)
-    scalar("SELECT COUNT(*) FROM #{quoted_table_name}").to_s.to_i32
+    scalar("SELECT COUNT(*) FROM #{quote(table_name)}").to_s.to_i32
+  end
+
+  def truncate(table_name : String) : Nil
+    exec "TRUNCATE #{quote(table_name)}"
   end
 
   def scalar(clause = "")

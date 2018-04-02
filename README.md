@@ -83,6 +83,7 @@ class Pon::Model
   - [x] count
   - [ ] scalar
   - [x] quote
+  - [ ] escape
   - [x] migrator
 - Adapter Drivers
   - [x] mysql
