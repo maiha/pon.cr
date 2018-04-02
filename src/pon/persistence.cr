@@ -36,7 +36,7 @@ module Pon::Persistence
           params = content_values + [pk]
 
           begin
-            self.class.adapter.update table_name, "{{primary_name}}", fields, params
+            self.class.adapter.update(fields, params)
           rescue err
             raise DB::Error.new(err.message)
           end

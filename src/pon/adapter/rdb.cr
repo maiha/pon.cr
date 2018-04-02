@@ -2,29 +2,29 @@
 abstract class Pon::Adapter::RDB < Pon::Adapter
   abstract def db : ::DB::Database
   abstract def logger : Logger
-  abstract def one?(id, fields : Array(String), as types : Tuple)
-  abstract def delete(key) : Bool
+  abstract def exec(query : String, params = [] of String)
+  abstract def scalar(*args)
 
   abstract def insert(fields, params, lastval)
-
-  abstract def exec(query : String, params = [] of String)
+  abstract def all(fields : Array(String), as types : Tuple, limit = nil)
+  abstract def one?(id, fields : Array(String), as types : Tuple)
   abstract def count : Int32
-  abstract def truncate : Nil
+  abstract def delete(key) : Bool
   abstract def delete : Nil
-  abstract def scalar(clause = "")
-  abstract def all(fields : Array(String), as types : Tuple, limit : Int32? = nil)
+  abstract def truncate : Nil
 
   delegate quote, to: self.class
-  delegate query_one?, query_all, to: db
+  delegate query_one?, query_all, scalar, to: db
 
   enum BindType
-    Q = 1                       # use question mark: '?'
-    D = 2                       # use dollar mark: '$1', '$2', ...
+    Question = 1                # "?"
+    Dollar   = 2                # "$1", "$2", ...
   end
 
-  QUOTING_CHAR = '"'
-  BIND_TYPE    = BindType::Q
-  LAST_VAL     = "SELECT LAST_INSERT_ROWID()"
+  # URL       = "" # This should be defined in subclasses
+  QUOTE     = '"'
+  BIND_TYPE = BindType::Question
+  LAST_VAL  = "SELECT LAST_INSERT_ROWID()"
 
   RawTypes = {
     "Bool"    => "BOOL",
@@ -38,12 +38,14 @@ abstract class Pon::Adapter::RDB < Pon::Adapter
 
   # Use macro in order to resolve subclass constants.
   macro inherited
-    @quoted_table_name : String
+    @qt : String                # quoted table name
+    @qp : String                # quoted primary name
 
     getter db : ::DB::Database
 
     def initialize(klass, @table_name : String, @primary_name : String, @setting : Setting? = nil)
-      @quoted_table_name = quote(@table_name)
+      @qt = quote(@table_name)
+      @qp = quote(@primary_name)
       @db = ::DB.open(setting("url"))
     end
 
@@ -55,75 +57,61 @@ abstract class Pon::Adapter::RDB < Pon::Adapter
     end
 
     def count : Int32
-      scalar("SELECT COUNT(*) FROM #{@quoted_table_name}").to_s.to_i32
-    end
-
-    def truncate : Nil
-      exec "TRUNCATE #{@quoted_table_name}"
-    end
-
-    def update(table_name, primary_name, fields, params)
-      stmt = String.build do |s|
-        s << "UPDATE #{@quoted_table_name} SET "
-        s << fields.map { |name| "#{quote(name)} = ?" }.join(", ")
-        s << " WHERE #{quote(primary_name)} = ?"
-      end
-      exec stmt, params
-    end
-
-    def delete : Nil
-      exec "DELETE FROM #{@quoted_table_name}"
-    end
-
-    def delete(value) : Nil
-      stmt = "DELETE FROM #{@quoted_table_name} WHERE #{quote(@primary_name)} = ?"
-      exec stmt, [value]
-    end
-    
-    def insert(fields, params, lastval)
-      stmt = build_insert_stmt(fields)
-      exec stmt, params
-      if lastval
-        return scalar(LAST_VAL).as(Int64)
-      else
-        return -1_i64
-      end
-    end
-    
-    def scalar(clause = "")
-      db.scalar(clause)
+      scalar("SELECT COUNT(*) FROM #{@qt}").to_s.to_i32
     end
 
     def all(fields : Array(String), as types : Tuple, limit : Int32? = nil)
-      stmt = build_select_stmt(fields: fields, limit: limit)
-      query_all stmt, as: types
+      query = select_statement(fields: fields, limit: limit)
+      logger.info "#{query}"
+      query_all query, as: types
     end
     
-    protected def build_select_stmt(fields : Array(String), where : String? = nil, limit : Int32? = nil)
-      String.build do |s|
+    def one?(id, fields : Array(String), as types : Tuple)
+      query = select_statement(fields: fields, where: "#{@qp} = ?", limit: 1)
+      logger.info "#{query}: #{id}"
+      query_one? query, id, as: types
+    end
+
+    def truncate : Nil
+      exec "TRUNCATE #{@qt}"
+    end
+
+    def update(fields, params)
+      exec "UPDATE #{@qt} SET #{qc(fields)} WHERE #{@qp} = ?", params
+    end
+
+    def delete : Nil
+      exec "DELETE FROM #{@qt}"
+    end
+
+    def delete(value) : Nil
+      exec "DELETE FROM #{@qt} WHERE #{@qp} = ?", [value]
+    end
+    
+    def insert(fields, params, lastval)
+      cols = fields.map{|n| quote(n)}.join(", ")
+      vals = Array.new(fields.size, "?").join(", ")
+
+      exec "INSERT INTO #{@qt} (#{cols}) VALUES (#{vals})", params
+      return lastval ? scalar(LAST_VAL).as(Int64) : -1_i64
+    end
+    
+    protected def select_statement(fields : Array(String), where : String? = nil, limit : Int32? = nil)
+      stmt = String.build do |s|
         s << "SELECT "
-        s << fields.map { |name| "#{@quoted_table_name}.#{quote(name)}" }.join(", ")
-        s << " FROM #{@quoted_table_name}"
+        s << fields.map { |name| "#{@qt}.#{quote(name)}" }.join(", ")
+        s << " FROM #{@qt}"
         s << " WHERE #{where}" if where
         s << " LIMIT #{limit}" if limit
       end
+      return underlying_prepared(stmt)
     end
-
-    protected def build_insert_stmt(fields : Array(String))
-      String.build do |s|
-        s << "INSERT INTO #{@quoted_table_name} ("
-        s << fields.map { |name| "#{quote(name)}" }.join(", ")
-        s << ") VALUES ("
-        s << fields.map { |name| "?" }.join(", ")
-        s << ")"
-      end
-    end
-    
+   
     protected def underlying_prepared(stmt : String) : String
       case BIND_TYPE
-      when .q?
+      when .question?
         return stmt
-      when .d?
+      when .dollar?
         bind_pos = 0
         logger.debug "UNDERLYING PREPARED(#{BIND_TYPE}): #{stmt}"
         converted = stmt.gsub(/\?/){ bind_pos += 1; "$#{bind_pos}" }
@@ -133,27 +121,30 @@ abstract class Pon::Adapter::RDB < Pon::Adapter
         raise Pon::Error.new("Unsupported bind type: #{BIND_TYPE}")
       end
     end
-    
+
+    # quote columns
+    private def qc(names : Array(String)) : String
+      names.map { |name| "#{quote(name)} = ?" }.join(", ")
+    end
+
     # ensures the value is quoted with idempotency
-    # returns the value itself when it already contains `QUOTING_CHAR`
+    # returns the value itself when it already contains `QUOTE`
     # ```crystal
     # quote("foo")       # => "`foo`"
     # quote("`foo`")     # => "`foo`"
     # quote("`foo`.bar") # => "`foo`.bar"
     # ```
     def self.quote(name : String) : String
-      char = QUOTING_CHAR
-      if name.includes?(char)
+      if name.includes?(QUOTE)
         return name
       else
-        return char + name + char
+        return QUOTE + name + QUOTE
       end
     end
 
-    # escapes the value by `QUOTING_CHAR`
+    # escapes the value by `QUOTE`
     def self.escape(name : String) : String
-      char = QUOTING_CHAR
-      char + name.gsub(char, "#{char}#{char}") + char
+      QUOTE + name.gsub(QUOTE, "#{QUOTE}#{QUOTE}") + QUOTE
     end
 
     # converts the crystal class to database type of this adapter
@@ -164,7 +155,8 @@ abstract class Pon::Adapter::RDB < Pon::Adapter
     def self.setting
       @@setting ||= Setting.new
     end
-
+    setting.url = URL
+    
     private def setting(key : String)
       setting = @setting || self.class.setting
       setting[key]? || raise ArgumentError.new("#{self.class}.setting.#{key} not found")
