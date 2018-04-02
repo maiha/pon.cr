@@ -4,6 +4,9 @@ abstract class Pon::Adapter::DB < Pon::Adapter
   abstract def logger : Logger
   abstract def one?(id, fields : Array(String), as types : Tuple)
 
+  delegate quote, to: self.class
+  delegate query_one?, query_all, to: db
+
   module Schema
     TYPES = {
       "Bool"    => "BOOL",
@@ -17,9 +20,6 @@ abstract class Pon::Adapter::DB < Pon::Adapter
   end
 
   DEFAULT = Setting.new
-
-  delegate quote, to: self.class
-  delegate query_one?, to: db
 
   @quoted_table_name : String
 
@@ -56,6 +56,11 @@ abstract class Pon::Adapter::DB < Pon::Adapter
     db.scalar(clause)
   end
 
+  def all(fields : Array(String), as types : Tuple)
+    stmt = build_select_stmt(fields: fields)
+    query_all stmt, as: types
+  end
+  
   def build_select_stmt(fields : Array(String), where : String? = nil, limit : Int32? = nil)
     stmt = String.build do |s|
       s << "SELECT "

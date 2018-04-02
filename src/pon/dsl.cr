@@ -113,6 +113,7 @@ module Pon::Dsl
     end
     
     def set_attributes(tuple : Tuple)
+      @new_record = false
       {% i = 0 %}
       {% for name, h in ALL_FIELDS %}
         self.{{name.id}} = tuple[{{i}}]

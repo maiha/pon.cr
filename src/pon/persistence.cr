@@ -8,9 +8,13 @@ module Pon::Persistence
     @created_at : Time?
 
     def self.delete_all
-      adapter.delete(table_name)
+      adapter.delete
     end
     
+    def save!(*args)
+      save(*args) || raise Pon::RecordNotSaved.new(self)
+    end
+
     def save(*args)
       create_or_update(*args)
     rescue Pon::RecordInvalid

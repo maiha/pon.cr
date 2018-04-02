@@ -23,6 +23,9 @@ module Pon
     getter record : Model
 
     def initialize(@record)
+      klass = @record.class
+      msg = "RecordNotSaved: #{klass}(#{@record})"
+      super(msg)
     end
   end
 end

@@ -69,5 +69,21 @@ module Pon::Core
       {% end %}
       return parsed_params
     end
+
+    ######################################################################
+    ### to_s
+
+    def to_s(io : IO)
+      io << "#{self.class.name}("
+      if new_record?
+        io << "(new record)"
+      else
+        io << "%s=%s" % [self.class.primary_name, {{primary_name}}?]
+      end
+      {% for name, type in CONTENT_FIELDS %}
+        io << ",{{name}}=%s" % {{name}}?
+      {% end %}
+      io << ")"
+    end
   end
 end
