@@ -1,7 +1,7 @@
 require "../spec_helper"
 
 private def adapter
-  Pon::Adapter::Pg.new
+  Pon::Adapter::Pg
 end
 
 describe Pon::Adapter::Pg do

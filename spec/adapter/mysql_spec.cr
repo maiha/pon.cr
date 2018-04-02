@@ -1,7 +1,7 @@
 require "../spec_helper"
 
 private def adapter
-  Pon::Adapter::Mysql.new
+  Pon::Adapter::Mysql
 end
 
 describe Pon::Adapter::Mysql do

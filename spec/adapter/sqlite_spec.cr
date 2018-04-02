@@ -1,7 +1,7 @@
 require "../spec_helper"
 
 private def adapter
-  Pon::Adapter::Sqlite.new
+  Pon::Adapter::Sqlite
 end
 
 describe Pon::Adapter::Sqlite do

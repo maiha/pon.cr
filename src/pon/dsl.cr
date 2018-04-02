@@ -29,7 +29,7 @@ module Pon::Dsl
   ### Adapter
   macro adapter(name) # => set adapter_name
     def self.adapter
-      @@adapter ||= ::Pon::Adapter::{{name.stringify.capitalize.id}}.new
+      @@adapter ||= ::Pon::Adapter::{{name.stringify.capitalize.id}}.new(self, table_name, primary_name)
     end
   end
 
@@ -37,7 +37,7 @@ module Pon::Dsl
     {% CONTENT_FIELDS[decl.var] = {name: decl.var, type: decl.type} %}
   end
 
-  macro _finish_fields
+  macro _finish_dsl
     {% primary_name = PRIMARY[:name] %}
     {% primary_type = PRIMARY[:type] %}
 

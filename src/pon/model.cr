@@ -6,7 +6,7 @@ class Pon::Model
   
   macro inherited
     macro finished
-      _finish_fields
+      _finish_dsl
 
       include Pon::Core
       include Pon::Validations

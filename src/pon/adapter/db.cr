@@ -15,35 +15,50 @@ abstract class Pon::Adapter::DB < Pon::Adapter
     }
   end
 
+  DEFAULT = Setting.new
+
+  delegate quote, to: self.class
+  delegate query_one?, to: db
+
+  @quoted_table_name : String
+
+  getter db : ::DB::Database
+
+  def initialize(klass, @table_name : String, @primary_name : String, @setting : Setting? = nil)
+    @quoted_table_name = quote(@table_name)
+    @db = ::DB.open(setting("url"))
+  end
+
+  private def setting(key : String)
+    setting = @setting || self.class.setting
+    setting[key]? || raise ArgumentError.new("#{self.class}.setting.#{key} not found")
+  end
+
   def exec(query : String, params = [] of String)
     logger.info "#{query}: #{params}"
     db.exec query, params
   end
 
-  def count(table_name : String) : Int32
-    scalar("SELECT COUNT(*) FROM #{quote(table_name)}").to_s.to_i32
+  def count : Int32
+    scalar("SELECT COUNT(*) FROM #{@quoted_table_name}").to_s.to_i32
   end
 
-  def truncate(table_name : String) : Nil
-    exec "TRUNCATE #{quote(table_name)}"
+  def truncate : Nil
+    exec "TRUNCATE #{@quoted_table_name}"
   end
 
-  def delete(table_name : String) : Nil
-    exec "DELETE FROM #{quote(table_name)}"
+  def delete : Nil
+    exec "DELETE FROM #{@quoted_table_name}"
   end
-
+  
   def scalar(clause = "")
     db.scalar(clause)
   end
 
   # Use macro in order to read a constant defined in each subclasses.
   macro inherited
-    getter db : ::DB::Database
-    delegate quote, to: self.class
-
-    def initialize(setting : Setting? = nil)
-      setting ||= DEFAULT
-      @db = ::DB.open(setting.url)
+    def self.setting
+      @@setting ||= Setting.new
     end
 
     # ensures the value is quoted with idempotency

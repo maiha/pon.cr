@@ -2,8 +2,7 @@ require "sqlite3"
 
 # Sqlite implementation of the Adapter
 class Pon::Adapter::Sqlite < Pon::Adapter::DB
-  DEFAULT = Setting.new
-  DEFAULT.url = "postgres://postgres:@127.0.0.1:5432/postgres"
+  setting.url = "sqlite3:test.sqlite3"
 
   module Schema
     QUOTING_CHAR = '"'
@@ -63,15 +62,11 @@ class Pon::Adapter::Sqlite < Pon::Adapter::DB
       stmt << ")"
     end
 
-    log statement, params
-
-    open do |db|
-      db.exec statement, params
-      if lastval
-        return db.scalar(last_val()).as(Int64)
-      else
-        return -1_i64
-      end
+    exec statement, params
+    if lastval
+      return db.scalar(last_val).as(Int64)
+    else
+      return -1_i64
     end
   end
 
@@ -87,11 +82,7 @@ class Pon::Adapter::Sqlite < Pon::Adapter::DB
       stmt << " WHERE #{quote(primary_name)}=?"
     end
 
-    log statement, params
-
-    open do |db|
-      db.exec statement, params
-    end
+    exec statement, params
   end
 
   # This will delete a row from the database.

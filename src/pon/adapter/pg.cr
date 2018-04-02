@@ -2,14 +2,14 @@ require "pg"
 
 # PostgreSQL implementation of the Adapter
 class Pon::Adapter::Pg < Pon::Adapter::DB
-  DEFAULT = Setting.new
-  DEFAULT.url = "postgres://postgres:@127.0.0.1:5432/postgres"
+  setting.url = "postgres://postgres:@127.0.0.1:5432/postgres"
 
   module Schema
     QUOTING_CHAR = '"'
     TYPES = {
       "AUTO_Int32" => "SERIAL PRIMARY KEY",
       "AUTO_Int64" => "BIGSERIAL PRIMARY KEY",
+      "Time::Span" => "TIME",
       "created_at" => "TIMESTAMP",
       "updated_at" => "TIMESTAMP",
     }
@@ -63,15 +63,11 @@ class Pon::Adapter::Pg < Pon::Adapter::DB
       stmt << ")"
     end
 
-    log statement, params
-
-    open do |db|
-      db.exec statement, params
-      if lastval
-        return db.scalar(last_val()).as(Int64)
-      else
-        return -1_i64
-      end
+    exec statement, params
+    if lastval
+      return scalar(last_val()).as(Int64)
+    else
+      return -1_i64
     end
   end
 
@@ -87,22 +83,12 @@ class Pon::Adapter::Pg < Pon::Adapter::DB
       stmt << " WHERE #{quote(primary_name)}=$#{fields.size + 1}"
     end
 
-    log statement, params
-
-    open do |db|
-      db.exec statement, params
-    end
+    exec statement, params
   end
 
-  # This will delete a row from the database.
-  def delete(table_name, primary_name, value)
-    statement = "DELETE FROM #{quote(table_name)} WHERE #{quote(primary_name)}=$1"
-
-    log statement, value
-
-    open do |db|
-      db.exec statement, value
-    end
+  def delete(value) : Nil
+    stmt = "DELETE FROM #{@quoted_table_name} WHERE #{quote(primary_name)}=$1"
+    exec stmt, value
   end
 
   private def _ensure_clause_template(clause)

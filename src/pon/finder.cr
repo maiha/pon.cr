@@ -1,7 +1,7 @@
 module Pon::Finder
   macro included
     def self.count
-      adapter.count(table_name)
+      adapter.count
     end
 
     def self.find(id : {{PRIMARY[:type]}})
@@ -19,7 +19,7 @@ module Pon::Finder
         s << " WHERE #{quote(primary_name)}=? LIMIT 1"
       end
 
-      if tuple = adapter.db.query_one? stmt, id, as: { {{ ALL_FIELDS.values.map{|h| h[:type].stringify + "?"}.join(",").id }} }
+      if tuple = adapter.query_one? stmt, id, as: { {{ ALL_FIELDS.values.map{|h| h[:type].stringify + "?"}.join(",").id }} }
         obj = new
         {% i = 0 %}
         {% for name, h in ALL_FIELDS %}
