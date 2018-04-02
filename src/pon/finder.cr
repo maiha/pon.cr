@@ -22,7 +22,7 @@ module Pon::Finder
     end
 
     def self.find?(id : {{PRIMARY[:type]}}) : {{@type}}?
-      if tuple = adapter.one?(id, fields: field_names, as: { {{ ALL_FIELDS.values.map{|h| h[:type].stringify + "?"}.join(",").id }} })
+      if tuple = adapter.one?(id, fields: field_names, as: {{ all_tuple }})
         new(tuple)
       else
         nil
