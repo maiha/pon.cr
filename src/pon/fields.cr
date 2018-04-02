@@ -21,7 +21,7 @@ module Pon::Fields
   ### Adapter
   macro adapter(name) # => set adapter_name
     def self.adapter
-      @@adapter ||= ::Pon::Adapter::{{name.stringify.capitalize.id}}({{@type}}).new
+      @@adapter ||= ::Pon::Adapter::{{name.stringify.capitalize.id}}.new
     end
   end
 

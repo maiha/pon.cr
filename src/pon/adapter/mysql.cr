@@ -1,6 +1,6 @@
 require "mysql"
 
-class Pon::Adapter::Mysql(T) < Pon::Adapter::DB(T)
+class Pon::Adapter::Mysql < Pon::Adapter::DB
   DEFAULT = Setting.new
   DEFAULT.url = "mysql://root@127.0.0.1:3306/mysql"
 

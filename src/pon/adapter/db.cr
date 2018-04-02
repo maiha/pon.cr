@@ -1,9 +1,7 @@
 # base class for crystal-db
-abstract class Pon::Adapter::DB(T) < Pon::Adapter
+abstract class Pon::Adapter::DB < Pon::Adapter
   abstract def db : ::DB::Database
   abstract def logger : Logger
-
-  delegate quoted_table_name, to: T
 
   module Schema
     TYPES = {
@@ -34,20 +32,33 @@ abstract class Pon::Adapter::DB(T) < Pon::Adapter
   # Use macro in order to read a constant defined in each subclasses.
   macro inherited
     getter db : ::DB::Database
+    delegate quote, to: self.class
 
     def initialize(setting : Setting? = nil)
       setting ||= DEFAULT
       @db = ::DB.open(setting.url)
     end
 
-    # quotes table and column names
+    # ensures the value is quoted with idempotency
+    # returns the value itself when it already contains `QUOTING_CHAR`
+    # ```crystal
+    # quote("foo")       # => "`foo`"
+    # quote("`foo`")     # => "`foo`"
+    # quote("`foo`.bar") # => "`foo`.bar"
+    # ```
     def self.quote(name : String) : String
       char = Schema::QUOTING_CHAR
-      char + name.gsub(char, "#{char}#{char}") + char
+      if name.includes?(char)
+        return name
+      else
+        return char + name + char
+      end
     end
 
-    def quote(name : String) : String
-      self.class.quote(name)
+    # escapes the value by `QUOTING_CHAR`
+    def self.escape(name : String) : String
+      char = Schema::QUOTING_CHAR
+      char + name.gsub(char, "#{char}#{char}") + char
     end
 
     # converts the crystal class to database type of this adapter
