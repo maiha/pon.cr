@@ -59,8 +59,11 @@ class Pon::Model
   def self.migrator : Migrator
   def self.migrate! : Nil
   def self.exec(sql) : Nil
-  def self.table_name : String
   def self.quote(v) : String
+
+  # Core
+  def self.table_name : String
+  def self.quoted_table_name : String
 
   # CRUD
   def self.count : Int32
