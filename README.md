@@ -28,31 +28,46 @@ job.time? # => nil
 job.save  # => true
 ```
 
-## API
+## API : Adapter
 
+```crystal
+  def exec(sql) : Nil
+  def lastval : Int64
+  def scalar(*args)
+
+  def insert(fields, params)
+  def all(fields : Array(String), as types : Tuple, limit = nil)
+  def one?(id, fields : Array(String), as types : Tuple)
+  def count : Int32
+  def delete(key) : Bool
+  def delete : Nil
+  def truncate : Nil
 ```
+
+## API : Model
+
+```crystal
 class Pon::Model
   # Databases
   def self.adapter : Adapter(A)
   def self.migrator : Migrator
   def self.migrate! : Nil
-  def self.exec(sql) : Nil
-  def self.quote(v) : String
-  def self.escape(v) : String
-  def self.truncate : Nil
 
   # Core
   def self.table_name : String
-  def self.quoted_table_name : String
   def new_record? : Bool
 
   # CRUD
   def self.create! : M
   def self.create : M
   def self.count : Int32
+  def self.all : Array(M)
+  def self.first : M
+  def self.first? : M?
   def save : Bool
   def save! : Bool
   def self.delete_all
+  def delete
 
   # Field "foo"
   def foo : T
@@ -66,7 +81,7 @@ class Pon::Model
   - [x] exec plain sql
   - [x] exec prepared statement
   - [x] count
-  - [ ] scalar
+  - [x] scalar
   - [x] quote
   - [ ] escape
   - [x] migrator
@@ -85,7 +100,7 @@ class Pon::Model
   - [x] inspect class and records
   - [ ] callbacks
   - [ ] validations
-  - [ ] natural keys
+  - [x] natural keys
 - CRUD
   - [x] all
   - [x] count

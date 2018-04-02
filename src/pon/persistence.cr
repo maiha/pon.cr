@@ -12,18 +12,19 @@ module Pon::Persistence
     end
     
     def save!(*args)
-      create_or_update(*args) || raise Pon::RecordNotSaved.new(self)
+      create_or_update!(*args) || raise Pon::RecordNotSaved.new(self)
     end
 
     def save(*args)
-      create_or_update(*args)
-    rescue Pon::RecordInvalid
+      create_or_update!(*args)
+    rescue DB::Error | Pon::Error
       false
     end
 
-    def create_or_update(*args)
+    def create_or_update!(*args)
       return false unless valid?
 
+      adapter = self.class.adapter
       begin
         __run_before_save
         table_name = self.class.table_name
@@ -36,7 +37,7 @@ module Pon::Persistence
           params = content_values + [pk]
 
           begin
-            self.class.adapter.update(fields, params)
+            adapter.update(fields, params)
           rescue err
             raise DB::Error.new(err.message)
           end
@@ -52,14 +53,16 @@ module Pon::Persistence
           end
           begin
             {% if primary_type.id == "Int32" %}
-              @{{primary_name}} = self.class.adapter.insert(fields, params, lastval: true).to_i32
+              adapter.insert(fields, params)
+              @{{primary_name}} = adapter.lastval.to_i32
             {% elsif primary_type.id == "Int64" %}
-              @{{primary_name}} = self.class.adapter.insert(fields, params, lastval: true)
+              adapter.insert(fields, params)
+              @{{primary_name}} = adapter.lastval
             {% elsif primary_auto == true %}
               {% raise "Failed to define #{@type.name}#save: Primary key must be Int(32|64), or set `auto: false` for natural keys.\n\n  primary #{primary_name} : #{primary_type}, auto: false\n" %}
             {% else %}
               if @{{primary_name}}
-                self.class.adapter.insert(fields, params, lastval: false)
+                adapter.insert(fields, params)
               else
                 message = "Primary key('{{primary_name}}') cannot be null"
                 errors << Pon::FieldError.new("{{primary_name}}", message)
@@ -81,7 +84,7 @@ module Pon::Persistence
           Pon.logger.error "Save Exception: #{message}"
           errors << Pon::FieldError.new(nil, message)
         end
-        return false
+        raise ex
       end
     end
 

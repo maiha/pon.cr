@@ -4,27 +4,32 @@ require "./spec_helper"
 module {{adapter.upcase.id}}
   class Kvs < Pon::Model
     adapter {{adapter.id}}
+    table_name kvs
     primary k : String, auto: false
     field   v : String
   end
 
   describe "[CASES] Natural Keys({{adapter.upcase.id}})" do
+    it "(setup)" do
+      Kvs.migrate!
+    end
+
     it "fails when a primary key is not set" do
       kv = Kvs.new
       kv.save.should be_false
       kv.errors.first.message.should eq "Primary key('k') cannot be null"
     end
 
-    pending "creates a new object when a primary key is given" do
+    it "creates a new object when a primary key is given" do
       Kvs.create!(k: "foo")
 
       Kvs.find("foo").k.should eq("foo")
     end
 
-    pending "updates an existing object" do
+    it "updates an existing object" do
       kv = Kvs.create!(k: "foo", v: "1")
-
       kv.v = "2"
+      kv.save!
 
       kv = Kvs.find("foo")
       kv.k.should eq("foo")
@@ -33,7 +38,7 @@ module {{adapter.upcase.id}}
   end
 
   describe "[CASES] Natural Keys({{adapter.upcase.id}}) usecases" do
-    pending "CRUD" do
+    it "CRUD" do
       Kvs.delete_all
 
       ## Create
@@ -58,7 +63,7 @@ module {{adapter.upcase.id}}
       Kvs.count.should eq(0)
     end
 
-    pending "creates a new record twice" do
+    it "creates a new record twice" do
       Kvs.delete_all
 
       # create a new record

@@ -3,9 +3,10 @@ abstract class Pon::Adapter::RDB < Pon::Adapter
   abstract def db : ::DB::Database
   abstract def logger : Logger
   abstract def exec(query : String, params = [] of String)
+  abstract def lastval : Int64
   abstract def scalar(*args)
 
-  abstract def insert(fields, params, lastval)
+  abstract def insert(fields, params)
   abstract def all(fields : Array(String), as types : Tuple, limit = nil)
   abstract def one?(id, fields : Array(String), as types : Tuple)
   abstract def count : Int32
@@ -88,12 +89,14 @@ abstract class Pon::Adapter::RDB < Pon::Adapter
       exec "DELETE FROM #{@qt} WHERE #{@qp} = ?", [value]
     end
     
-    def insert(fields, params, lastval)
+    def insert(fields, params)
       cols = fields.map{|n| quote(n)}.join(", ")
       vals = Array.new(fields.size, "?").join(", ")
-
       exec "INSERT INTO #{@qt} (#{cols}) VALUES (#{vals})", params
-      return lastval ? scalar(LAST_VAL).as(Int64) : -1_i64
+    end
+
+    def lastval : Int64
+      scalar(LAST_VAL).as(Int64)
     end
     
     protected def select_statement(fields : Array(String), where : String? = nil, limit : Int32? = nil)
