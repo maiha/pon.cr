@@ -5,6 +5,11 @@ private class Multibyte < Pon::Model
   field   v : String
 end
 
+private class Multibyte2 < Pon::Model
+  adapter mysql
+  table_name "mb2"
+end
+
 describe "Core" do
   it "(setup)" do
     Multibyte.migrate!
@@ -14,8 +19,12 @@ describe "Core" do
     it "should be pluralized with downcase" do
       Multibyte.table_name.should eq("multibytes")
     end
+
+    it "should be settable" do
+      Multibyte2.table_name.should eq("mb2")
+    end
   end
-  
+
   it "supports multibytes" do
     r = Multibyte.create(v: "まいは")
     r.v.should eq("まいは")
