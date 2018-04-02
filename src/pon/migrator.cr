@@ -33,7 +33,7 @@ module Pon::Migrator
     end
   end
 
-  macro _finish_migrator
+  macro included
     {% primary_name = PRIMARY[:name] %}
     {% primary_type = PRIMARY[:type] %}
     {% primary_auto = PRIMARY[:auto] %}

@@ -1,4 +1,4 @@
-module Pon::Validations(T, P)
+module Pon::Validations
   macro included
     getter errors : Array(Pon::Error) = Array(Pon::Error).new
 

@@ -1,4 +1,4 @@
-module Pon::Persistence(T, P)
+module Pon::Persistence
   macro included
     {% primary_name = PRIMARY[:name] %}
     {% primary_type = PRIMARY[:type] %}
@@ -7,6 +7,10 @@ module Pon::Persistence(T, P)
     @updated_at : Time?
     @created_at : Time?
 
+    def self.delete_all
+      adapter.delete(table_name)
+    end
+    
     def save(*args)
       create_or_update(*args)
     rescue Pon::RecordInvalid

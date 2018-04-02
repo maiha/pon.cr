@@ -1,4 +1,4 @@
-module Pon::Fields
+module Pon::Dsl
   macro included
     macro inherited
       SETTINGS       = {} of Nil => Nil
@@ -55,85 +55,8 @@ module Pon::Fields
         @{{name.id}}.not_nil!
       end
     {% end %}
-
-    @@table_name : String =
-      {% if SETTINGS[:table_name] %}
-        {{ SETTINGS[:table_name].stringify }}
-      {% else %}
-        LuckyInflector::Inflector.tableize({{ @type.name.id.stringify }}).gsub("/","_")
-      {% end %}
-    def self.table_name
-      @@table_name
-    end
-
+   
     alias Types = {{ (ALL_FIELDS.values.map{|h| h[:type].stringify} + ["Nil"]).sort.join("|").id }}
-
-    @@primary_name = "{{primary_name}}"
-    def self.primary_name
-      @@primary_name
-    end
-    
-    def self.quoted_table_name
-      quote(table_name)
-    end
-
-    def self.quote(v)
-      adapter.quote(v)
-    end
-
-    def self.field_names : Array(String)
-      @@field_names ||=
-        {% if ALL_FIELDS.empty? %}
-           Array(String).new
-        {% else %}
-           {{ ALL_FIELDS.values.map(&.[:name].stringify) }}
-        {% end %}
-    end
-
-    def self.content_field_names : Array(String)
-      @@content_field_names ||=
-        {% if CONTENT_FIELDS.empty? %}
-           Array(String).new
-        {% else %}
-           {{ CONTENT_FIELDS.keys.map(&.stringify) }}
-        {% end %}
-    end
-
-    def content_values
-      parsed_params = [] of Types
-      {% for name, type in CONTENT_FIELDS %}
-        {% if type.id == Time.id %}
-          parsed_params << {{name.id}}?.try(&.to_s("%F %X"))
-        {% else %}
-          parsed_params << {{name.id}}?
-        {% end %}
-      {% end %}
-      return parsed_params
-    end
-    
-    def self.get?(id : {{primary_type}}) : {{@type}}?
-      fields = field_names
-      clause = ""
-      
-      stmt = String.build do |s|
-        s << "SELECT "
-        s << fields.map { |name| "#{quote(table_name)}.#{quote(name)}" }.join(", ")
-        s << " FROM #{quote(table_name)}"
-        s << " WHERE #{quote(primary_name)}=? LIMIT 1"
-      end
-
-      if tuple = adapter.db.query_one? stmt, id, as: { {{ ALL_FIELDS.values.map{|h| h[:type].stringify + "?"}.join(",").id }} }
-        obj = new
-        {% i = 0 %}
-        {% for name, h in ALL_FIELDS %}
-          obj.{{name.id}} = tuple[{{i}}]
-          {% i = i + 1 %}
-        {% end %}
-        return obj
-      else
-        return nil
-      end
-    end
 
     def initialize(**args : Object)
       set_attributes(args.to_h)

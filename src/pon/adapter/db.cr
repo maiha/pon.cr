@@ -28,6 +28,10 @@ abstract class Pon::Adapter::DB < Pon::Adapter
     exec "TRUNCATE #{quote(table_name)}"
   end
 
+  def delete(table_name : String) : Nil
+    exec "DELETE FROM #{quote(table_name)}"
+  end
+
   def scalar(clause = "")
     db.scalar(clause)
   end

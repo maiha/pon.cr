@@ -1,18 +1,18 @@
-require "./fields"
+require "./dsl"
 
 class Pon::Model
-  include Fields
-  include Migrator
+  include Dsl
   include Callbacks
   
   macro inherited
     macro finished
       _finish_fields
-      _finish_migrator
 
-      include Pon::Validations(Types, {{PRIMARY[:type]}})
-      include Pon::Persistence(Types, {{PRIMARY[:type]}})
-      include Pon::Finder(Types)
+      include Pon::Core
+      include Pon::Validations
+      include Pon::Persistence
+      include Pon::Finder
+      include Pon::Migrator
     end
   end
 end
