@@ -1,7 +1,7 @@
 require "pg"
 
 # PostgreSQL implementation of the Adapter
-class Pon::Adapter::Pg < Pon::Adapter::DB
+class Pon::Adapter::Pg < Pon::Adapter::RDB
   setting.url = "postgres://postgres:@127.0.0.1:5432/postgres"
 
   module Schema

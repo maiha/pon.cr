@@ -1,5 +1,5 @@
 # base class for crystal-db
-abstract class Pon::Adapter::DB < Pon::Adapter
+abstract class Pon::Adapter::RDB < Pon::Adapter
   abstract def db : ::DB::Database
   abstract def logger : Logger
   abstract def one?(id, fields : Array(String), as types : Tuple)
@@ -101,7 +101,7 @@ abstract class Pon::Adapter::DB < Pon::Adapter
 
     # converts the crystal class to database type of this adapter
     def self.schema_type?(key : String)
-      Schema::TYPES[key]? || Pon::Adapter::DB::Schema::TYPES[key]?
+      Schema::TYPES[key]? || Pon::Adapter::RDB::Schema::TYPES[key]?
     end
   end
 end

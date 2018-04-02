@@ -1,6 +1,6 @@
 require "mysql"
 
-class Pon::Adapter::Mysql < Pon::Adapter::DB
+class Pon::Adapter::Mysql < Pon::Adapter::RDB
   setting.url = "mysql://root@127.0.0.1:3306/mysql"
 
   module Schema

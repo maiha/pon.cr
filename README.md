@@ -93,9 +93,12 @@ class Pon::Model
   - [ ] escape
   - [x] migrator
 - Adapter Drivers
-  - [x] mysql
-  - [x] pg
-  - [x] sqlite
+  - RDB
+    - [x] mysql
+    - [x] pg
+    - [x] sqlite
+  - KVS
+    - [ ] redis
 - Core
   - [x] pluralize table names
   - [ ] custom type
@@ -111,7 +114,12 @@ class Pon::Model
   - [ ] delete
   - [x] find
   - [x] save
-
+- Relations
+  - [ ] belongs_to
+  - [ ] has_many
+  - [ ] has_many through
+- Misc
+  - [ ] bulk insert
 
 ## Development
 

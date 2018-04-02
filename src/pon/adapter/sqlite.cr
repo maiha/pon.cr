@@ -1,7 +1,7 @@
 require "sqlite3"
 
 # Sqlite implementation of the Adapter
-class Pon::Adapter::Sqlite < Pon::Adapter::DB
+class Pon::Adapter::Sqlite < Pon::Adapter::RDB
   setting.url = "sqlite3:test.sqlite3"
 
   module Schema

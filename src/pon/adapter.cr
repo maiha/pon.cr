@@ -10,4 +10,4 @@ abstract class Pon::Adapter
   delegate logger, to: Pon
 end
 
-require "./adapter/*"
+require "./adapter/rdb"
