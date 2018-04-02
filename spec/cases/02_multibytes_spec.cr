@@ -1,13 +1,14 @@
 require "./spec_helper"
 
 {% for adapter in ADAPTERS %}
-  module {{adapter.upcase.id}}
+module {{adapter.upcase.id}}
+  class Multibyte < Pon::Model
+    adapter {{adapter.id}}
+    field   v : String
+  end
 
-    class Multibyte < Pon::Model
-      adapter mysql
-      field   v : String
-    end
-
+  describe "[CASES] multibytes ({{adapter.upcase.id}})" do
+  
     describe "Multibyte" do
       it "supported" do
         r = Multibyte.create(v: "まいは")
@@ -16,4 +17,5 @@ require "./spec_helper"
     end
 
   end
+end
 {% end %}

@@ -50,7 +50,7 @@ module Pon::Migrator
     
       def create
         resolve = ->(key : String) {
-          {{adapter}}.class.schema_type?(key) || raise "Migrator(#{ {{adapter}}.class.name }) doesn't support '#{key}' yet."
+          {{adapter}}.class.raw_type?(key) || raise "Migrator(#{ {{adapter}}.class.name }) doesn't support '#{key}' yet."
         }
 
         stmt = String.build do |s|

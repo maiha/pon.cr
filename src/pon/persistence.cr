@@ -12,7 +12,7 @@ module Pon::Persistence
     end
     
     def save!(*args)
-      save(*args) || raise Pon::RecordNotSaved.new(self)
+      create_or_update(*args) || raise Pon::RecordNotSaved.new(self)
     end
 
     def save(*args)
@@ -52,14 +52,14 @@ module Pon::Persistence
           end
           begin
             {% if primary_type.id == "Int32" %}
-              @{{primary_name}} = self.class.adapter.insert(table_name, fields, params, lastval: true).to_i32
+              @{{primary_name}} = self.class.adapter.insert(fields, params, lastval: true).to_i32
             {% elsif primary_type.id == "Int64" %}
-              @{{primary_name}} = self.class.adapter.insert(table_name, fields, params, lastval: true)
+              @{{primary_name}} = self.class.adapter.insert(fields, params, lastval: true)
             {% elsif primary_auto == true %}
               {% raise "Failed to define #{@type.name}#save: Primary key must be Int(32|64), or set `auto: false` for natural keys.\n\n  primary #{primary_name} : #{primary_type}, auto: false\n" %}
             {% else %}
               if @{{primary_name}}
-                self.class.adapter.insert(table_name, fields, params, lastval: false)
+                self.class.adapter.insert(fields, params, lastval: false)
               else
                 message = "Primary key('{{primary_name}}') cannot be null"
                 errors << Pon::FieldError.new("{{primary_name}}", message)
@@ -85,11 +85,14 @@ module Pon::Persistence
       end
     end
 
-    # Destroy will remove this from the database.
-    def destroy
+    def delete!
+      delete || raise Pon::RecordNotDeleted.new(self)
+    end
+
+    def delete
       begin
         __run_before_destroy
-        self.class.adapter.delete(@@table_name, @@primary_name, {{primary_name}})
+        self.class.adapter.delete({{primary_name}})
         __run_after_destroy
         @destroyed = true
         return true
@@ -110,7 +113,7 @@ module Pon::Persistence
     
     def self.create!(**args)
       object = new(args.to_h)
-      object.save || raise Pon::RecordInvalid.new(object)
+      object.save! || raise Pon::RecordInvalid.new(object)
       object
     end
     

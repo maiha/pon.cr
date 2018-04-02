@@ -9,23 +9,25 @@ module Pon
     end
   end
   
-  class RecordInvalid < Error
-    def initialize(@record : Model? = nil)
-      message = "Record invalid"
-      super(message)
-    end
-  end
-  
   class RecordNotFound < Error
   end
 
-  class RecordNotSaved < Error
+  class RecordError < Error
     getter record : Model
 
     def initialize(@record)
       klass = @record.class
-      msg = "RecordNotSaved: #{klass}(#{@record})"
+      msg = "#{self.class.name}: #{@record}"
       super(msg)
     end
+  end
+
+  class RecordInvalid < RecordError
+  end
+  
+  class RecordNotSaved < RecordError
+  end
+
+  class RecordNotDeleted < RecordError
   end
 end
