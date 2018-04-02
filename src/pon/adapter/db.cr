@@ -56,8 +56,8 @@ abstract class Pon::Adapter::DB < Pon::Adapter
     db.scalar(clause)
   end
 
-  def all(fields : Array(String), as types : Tuple)
-    stmt = build_select_stmt(fields: fields)
+  def all(fields : Array(String), as types : Tuple, limit : Int32? = nil)
+    stmt = build_select_stmt(fields: fields, limit: limit)
     query_all stmt, as: types
   end
   

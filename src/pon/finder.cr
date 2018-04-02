@@ -9,6 +9,14 @@ module Pon::Finder
       adapter.all(fields: field_names, as: {{ all_tuple }}).map{|t| new(t)}
     end
 
+    def self.first?
+      adapter.all(fields: field_names, limit: 1, as: {{ all_tuple }}).map{|t| new(t)}.first?
+    end
+
+    def self.first
+      first? || raise Pon::RecordNotFound.new("{{@type}}.first")
+    end
+
     def self.find(id : {{PRIMARY[:type]}})
       find?(id) || raise Pon::RecordNotFound.new("Couldn't find {{@type}} with '#{ {{@type}}.primary_name }'=#{id}")
     end

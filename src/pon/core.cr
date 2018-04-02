@@ -73,17 +73,21 @@ module Pon::Core
     ######################################################################
     ### to_s
 
-    def to_s(io : IO)
-      io << "#{self.class.name}("
-      if new_record?
-        io << "(new record)"
-      else
-        io << "%s=%s" % [self.class.primary_name, {{primary_name}}?]
-      end
-      {% for name, type in CONTENT_FIELDS %}
-        io << ",{{name}}=%s" % {{name}}?
-      {% end %}
+    def self.to_s(io : IO)
+      # => "Job(id: Int32, name: String, time: Time::Span)"
+      io << "#{name}("
+      io << {{ ALL_FIELDS.map{|n,h| "#{n}: #{h[:type]}"}.join(", ") }}
       io << ")"
+    end
+
+    def to_s(io : IO)
+      # => "#<Job id: 1, name: "foo", time: nil>"
+      io << "#<#{self.class.name} "
+      io << "{{primary_name}}: %s" % {{primary_name}}?.inspect
+      {% for name, h in CONTENT_FIELDS %}
+        io << ", {{name}}: %s" % {{name}}?.inspect
+      {% end %}
+      io << ">"
     end
   end
 end

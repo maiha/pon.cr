@@ -1,42 +1,23 @@
 require "./spec_helper"
 
-private class Multibyte < Pon::Model
-  adapter mysql
-  field   v : String
-end
+{% for adapter in ADAPTERS %}
+module {{adapter.upcase.id}}
+  describe "[{{adapter.upcase.id}}](Core)" do
 
-private class Multibyte2 < Pon::Model
-  adapter mysql
-  table_name "test.mb2"
-end
-
-describe "Core" do
-  it "(setup)" do
-    Multibyte.migrate!
-  end
-
-  describe ".table_name" do
-    it "should be pluralized with downcase" do
-      Multibyte.table_name.should eq("multibytes")
+    describe "Model.to_s" do
+      it "prints column names and its types" do
+        # strip prefix: "MYSQL::Job" -> "Job"
+        Job.to_s.sub(/^.*?::/,"").should eq("Job(id: Int32, name: String, time: Time::Span)")
+      end
     end
 
-    it "should be settable" do
-      Multibyte2.table_name.should eq("test.mb2")
+    describe "Model#to_s" do
+      it "prints column names and its values" do
+        # => "#<Job id: 1, name: "foo", time: nil>"
+        job = Job.new(id: 1, name: "foo")
+        job.to_s.sub(/[A-Z]+::/,"").should eq("#<Job id: 1, name: \"foo\", time: nil>")
+      end
     end
-  end
-
-  describe ".quoted_table_name" do
-    it "should quote with backtick" do
-      Multibyte.quoted_table_name.should eq("`multibytes`")
-    end
-
-    it "should be settable" do
-      Multibyte2.quoted_table_name.should eq("`test.mb2`")
-    end
-  end
-
-  it "supports multibytes" do
-    r = Multibyte.create(v: "まいは")
-    r.v.should eq("まいは")
   end
 end
+{% end %}

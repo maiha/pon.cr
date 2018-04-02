@@ -1,18 +1,10 @@
 require "./spec_helper"
 
-
 {% for adapter in ADAPTERS %}
   module {{adapter.upcase.id}}
-    class Job < Pon::Model
-      adapter {{adapter.id}}
-      table_name jobs
-      primary id : Int32
-      field   name : String
-      field   time : Time::Span
-    end
-
     describe "[{{adapter.upcase.id}}]" do
-      describe "CRUD" do
+
+      describe "(CRUD)" do
         it "(setup)" do
           Job.migrate!
         end
@@ -52,7 +44,7 @@ require "./spec_helper"
         end
 
         describe ".first" do
-          pending "returns the first record" do
+          it "returns the first record" do
             Job.delete_all
             Job.create!(name: "foo")
             Job.first.name.should eq("foo")
@@ -75,7 +67,7 @@ require "./spec_helper"
             job.new_record?.should be_true
 
             job.id?.should be_a(Nil)
-            job.save
+            job.save!
             job.id?.should be_a(Int32)
           end
 
@@ -107,6 +99,7 @@ require "./spec_helper"
           end
         end
       end
+
     end
   end
 {% end %}

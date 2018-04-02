@@ -39,7 +39,7 @@ class Job < Pon::Model
 end
 
 Pon::Adapter::Mysql::DEFAULT.url = "mysql://root@127.0.0.1:3306/test"
-Job.migrate!  # drop and create the table
+Job.migrate! # drop and create the table
 
 Job.count # => 0
 
@@ -47,7 +47,7 @@ job = Job.new(name: "foo")
 job.name  # => "foo"
 job.time? # => nil
 
-# job.save # TODO
+job.save  # => true
 ```
 
 ## API
@@ -55,19 +55,26 @@ job.time? # => nil
 ```
 class Pon::Model
   # Databases
-  def self.adapter : Adapter(T)
+  def self.adapter : Adapter(A)
   def self.migrator : Migrator
   def self.migrate! : Nil
   def self.exec(sql) : Nil
   def self.quote(v) : String
+  def self.escape(v) : String
+  def self.truncate : Nil
 
   # Core
   def self.table_name : String
   def self.quoted_table_name : String
+  def new_record? : Bool
 
   # CRUD
+  def self.create! : M
+  def self.create : M
   def self.count : Int32
   def save : Bool
+  def save! : Bool
+  def self.delete_all
 
   # Field "foo"
   def foo : T
@@ -79,7 +86,7 @@ class Pon::Model
 - Adapter Core
   - [x] connect lazily
   - [x] exec plain sql
-  - [ ] exec prepared statement
+  - [x] exec prepared statement
   - [x] count
   - [ ] scalar
   - [x] quote
@@ -87,23 +94,23 @@ class Pon::Model
   - [x] migrator
 - Adapter Drivers
   - [x] mysql
-  - [ ] pg
-  - [ ] sqlite
+  - [x] pg
+  - [x] sqlite
 - Core
   - [x] pluralize table names
   - [ ] custom type
-  - [ ] multibytes
-  - [ ] record status
-  - [ ] inspect class and records
+  - [x] multibytes
+  - [x] record status
+  - [x] inspect class and records
   - [ ] callbacks
   - [ ] validations
 - CRUD
-  - [ ] all
+  - [x] all
   - [x] count
-  - [ ] create
+  - [x] create
   - [ ] delete
-  - [ ] find
-  - [ ] save
+  - [x] find
+  - [x] save
 
 
 ## Development
