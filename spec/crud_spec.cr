@@ -9,7 +9,7 @@ require "./spec_helper"
           Job.migrate!
         end
         
-        describe ".new" do
+        describe "Model.new" do
           it "works" do
             job = Job.new(name: "foo")
             job.id?.should eq(nil)
@@ -18,23 +18,13 @@ require "./spec_helper"
           end
         end
 
-        describe ".count" do
+        describe "Model.count" do
           it "returns the number of records" do
             Job.count.should eq(0)
           end
         end
 
-        describe ".delete_all" do
-          it "deletes all records" do
-            Job.create!(name: "foo")
-            Job.count.should_not eq(0)
-
-            Job.delete_all
-            Job.count.should eq(0)
-          end
-        end
-
-        describe ".all" do
+        describe "Model.all" do
           it "returns all records" do
             Job.delete_all
             3.times{|i| Job.create!(name: i)}
@@ -43,16 +33,40 @@ require "./spec_helper"
           end
         end
 
-        describe ".first" do
-          it "returns the first record" do
+        describe "Model.first" do
+          it "raises Pon::RecordNotFound if no records exist" do
             Job.delete_all
+            expect_raises(Pon::RecordNotFound) do
+              Job.first
+            end
+          end
+
+          it "returns the first record if exists" do
             Job.create!(name: "foo")
             Job.first.name.should eq("foo")
           end
         end
 
-        describe ".find(id)" do
-          it "works" do
+        describe "Model.first?" do
+          it "returns nil if no records exist" do
+            Job.delete_all
+            Job.first?.should eq(nil)
+          end
+
+          it "returns the first record if exists" do
+            Job.create!(name: "foo")
+            Job.first?.should be_a(Job)
+          end
+        end
+
+        describe "Model.find(id)" do
+          it "raises Pon::RecordNotFound if the record doesn't exist" do
+            expect_raises(Pon::RecordNotFound) do
+              Job.find(-1)
+            end
+          end
+
+          it "returns the specified record if exists" do
             job = Job.create!(name: "foo")
 
             job = Job.find(job.id)
@@ -61,7 +75,22 @@ require "./spec_helper"
           end
         end
 
-        describe ".save" do
+        describe "Model.find?(id)" do
+          it "returns nil if the record doesn't exist" do
+            Job.find?(-1).should eq(nil)
+          end
+
+          it "returns the specified record if exists" do
+            job = Job.create!(name: "foo")
+
+            job = Job.find?(job.id)
+            job.should be_a(Job)
+            job.try(&.new_record?).should be_false
+            job.try(&.name).should eq("foo")
+          end
+        end
+
+        describe "Model#save!" do
           it "inserts a new record when new_record?" do
             job = Job.new(name: "foo")
             job.new_record?.should be_true
@@ -83,19 +112,36 @@ require "./spec_helper"
           end
         end
 
-        describe ".create" do
-          it "works" do
+        describe "Model.create" do
+          it "creates a new record" do
             job = Job.create(name: "foo")
             job.new_record?.should be_false
             job.name.should eq("foo")
           end
         end
 
-        describe ".create!" do
-          it "works" do
+        describe "Model.create!" do
+          it "creates a new record" do
             job = Job.create!(name: "foo")
             job.new_record?.should be_false
             job.name.should eq("foo")
+          end
+        end
+
+        describe "Model.delete_all" do
+          it "deletes all records" do
+            Job.count.should_not eq(0)
+            Job.delete_all
+            Job.count.should eq(0)
+          end
+        end
+
+        describe "Model#delete" do
+          it "deletes the record" do
+            job = Job.create!(name: "foo")
+            Job.find?(job.id).should be_a(Job)
+            job.delete.should be_true
+            Job.find?(job.id).should be_a(Nil)
           end
         end
       end

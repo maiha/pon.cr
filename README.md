@@ -102,10 +102,9 @@ class Pon::Model
   - [ ] validations
   - [x] natural keys
 - CRUD
-  - [x] all
-  - [x] count
+  - [x] all, count, first
   - [x] create
-  - [ ] delete
+  - [x] delete, delete_all
   - [x] find
   - [x] save
 - Relations
