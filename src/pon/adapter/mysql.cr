@@ -86,6 +86,4 @@ class Pon::Adapter::Mysql < Pon::Adapter::RDB
 
     exec statement, params
   end
-
-  Adapters["mysql"] = self.as(Adapter.class)
 end
