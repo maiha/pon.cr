@@ -98,5 +98,26 @@ module Pon::Dsl
       {% end %}
       return self
     end
+
+    ######################################################################
+    ### Model.new(tuple)
+
+    # called from `DB#query_all`
+    # ```
+    # db.query_all "select a,b from ...", as: {a: String, b: Int32}
+    # ```
+    def self.new(tuple : Tuple)
+      obj = new
+      obj.set_attributes(tuple)
+      return obj
+    end
+    
+    def set_attributes(tuple : Tuple)
+      {% i = 0 %}
+      {% for name, h in ALL_FIELDS %}
+        self.{{name.id}} = tuple[{{i}}]
+        {% i = i + 1 %}
+      {% end %}
+    end
   end
 end

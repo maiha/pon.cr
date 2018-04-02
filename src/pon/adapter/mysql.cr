@@ -14,6 +14,12 @@ class Pon::Adapter::Mysql < Pon::Adapter::DB
     }
   end
 
+  def one?(id, fields : Array(String), as types : Tuple)
+    where = "#{quote(@primary_name)} = ?"
+    stmt  = build_select_stmt(fields: fields, where: where, limit: 1)
+    query_one? stmt, id, as: types
+  end
+  
   # select performs a query against a table.  The table_name and fields are
   # configured using the sql_mapping directive in your model.  The clause and
   # params is the query and params that is passed in via .all() method

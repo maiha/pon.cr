@@ -9,26 +9,10 @@ module Pon::Finder
     end
 
     def self.find?(id : {{PRIMARY[:type]}}) : {{@type}}?
-      fields = field_names
-      clause = ""
-      
-      stmt = String.build do |s|
-        s << "SELECT "
-        s << fields.map { |name| "#{quote(table_name)}.#{quote(name)}" }.join(", ")
-        s << " FROM #{quote(table_name)}"
-        s << " WHERE #{quote(primary_name)}=? LIMIT 1"
-      end
-
-      if tuple = adapter.query_one? stmt, id, as: { {{ ALL_FIELDS.values.map{|h| h[:type].stringify + "?"}.join(",").id }} }
-        obj = new
-        {% i = 0 %}
-        {% for name, h in ALL_FIELDS %}
-          obj.{{name.id}} = tuple[{{i}}]
-          {% i = i + 1 %}
-        {% end %}
-        return obj
+      if tuple = adapter.one?(id, fields: field_names, as: { {{ ALL_FIELDS.values.map{|h| h[:type].stringify + "?"}.join(",").id }} })
+        new(tuple)
       else
-        return nil
+        nil
       end
     end
   end

@@ -15,27 +15,12 @@ class Pon::Adapter::Pg < Pon::Adapter::DB
     }
   end  
 
-  # select performs a query against a table.  The table_name and fields are
-  # configured using the sql_mapping directive in your model.  The clause and
-  # params is the query and params that is passed in via .all() method
-  def select(table_name, fields, clause = "", params = [] of DB::Any, &block)
-    clause = _ensure_clause_template(clause)
-
-    statement = String.build do |stmt|
-      stmt << "SELECT "
-      stmt << fields.map { |name| "#{quote(table_name)}.#{quote(name)}" }.join(", ")
-      stmt << " FROM #{quote(table_name)} #{clause}"
-    end
-
-    log statement, params
-
-    open do |db|
-      db.query statement, params do |rs|
-        yield rs
-      end
-    end
+  def one?(id, fields : Array(String), as types : Tuple)
+    where = "#{quote(@primary_name)} = $1"
+    stmt  = build_select_stmt(fields: fields, where: where, limit: 1)
+    query_one? stmt, id, as: types
   end
-
+  
   # select_one is used by the find method.
   def select_one(table_name, fields, field, id, &block)
     statement = String.build do |stmt|

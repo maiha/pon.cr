@@ -5,6 +5,7 @@ require "./spec_helper"
   module {{adapter.upcase.id}}
     class Job < Pon::Model
       adapter {{adapter.id}}
+      table_name jobs
       primary id : Int32
       field   name : String
       field   time : Time::Span

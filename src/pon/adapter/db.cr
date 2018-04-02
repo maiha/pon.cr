@@ -2,6 +2,7 @@
 abstract class Pon::Adapter::DB < Pon::Adapter
   abstract def db : ::DB::Database
   abstract def logger : Logger
+  abstract def one?(id, fields : Array(String), as types : Tuple)
 
   module Schema
     TYPES = {
@@ -53,6 +54,16 @@ abstract class Pon::Adapter::DB < Pon::Adapter
   
   def scalar(clause = "")
     db.scalar(clause)
+  end
+
+  def build_select_stmt(fields : Array(String), where : String? = nil, limit : Int32? = nil)
+    stmt = String.build do |s|
+      s << "SELECT "
+      s << fields.map { |name| "#{@quoted_table_name}.#{quote(name)}" }.join(", ")
+      s << " FROM #{@quoted_table_name}"
+      s << " WHERE #{where}" if where
+      s << " LIMIT #{limit}" if limit
+    end
   end
 
   # Use macro in order to read a constant defined in each subclasses.
