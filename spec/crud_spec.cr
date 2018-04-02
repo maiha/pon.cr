@@ -29,12 +29,38 @@ describe "CRUD" do
 
   describe ".save" do
     it "works" do
-      Job.count.should eq(0)
+      Job.adapter.truncate(Job.table_name)
 
       job = Job.new(name: "foo")
+      job.id?.should eq(nil)
       job.save.should be_true
+      job.new_record?.should be_false
+      job.id?.should eq(1)
+    end
+  end
 
-      Job.count.should eq(1)
+  describe ".create" do
+    it "works" do
+      job = Job.create(name: "foo")
+      job.new_record?.should be_false
+      job.name.should eq("foo")
+    end
+  end
+
+  describe ".create!" do
+    it "works" do
+      job = Job.create!(name: "foo")
+      job.new_record?.should be_false
+      job.name.should eq("foo")
+    end
+  end
+
+  describe ".find(id)" do
+    it "works" do
+      job = Job.create!(name: "foo")
+
+      job = Job.find(job.id)
+      job.name.should eq("foo")
     end
   end
 end

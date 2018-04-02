@@ -2,17 +2,25 @@ module Pon::Fields
   macro included
     macro inherited
       SETTINGS       = {} of Nil => Nil
-      PRIMARY        = {name: id, type: Int64}
+      PRIMARY        = {name: id, type: Int64, auto: true}
       CONTENT_FIELDS = {} of Int32 => HashLiteral(Symbol, ASTNode)
       ALL_FIELDS     = {} of Int32 => HashLiteral(Symbol, ASTNode)
     end
   end
 
+  # specify the primary key column and type
   macro primary(decl)
     {% PRIMARY[:name] = decl.var %}
     {% PRIMARY[:type] = decl.type %}
   end
 
+  # specify the primary key column and type and auto_increment
+  macro primary(decl, auto)
+    {% PRIMARY[:name] = decl.var %}
+    {% PRIMARY[:type] = decl.type %}
+    {% PRIMARY[:auto] = auto %}
+  end
+  
   macro table_name(name)
     {% SETTINGS[:table_name] = name.id %}
   end
@@ -78,7 +86,7 @@ module Pon::Fields
         {% if ALL_FIELDS.empty? %}
            Array(String).new
         {% else %}
-           {{ ALL_FIELDS.values.map{|h| h[:name]} }}
+           {{ ALL_FIELDS.values.map(&.[:name].stringify) }}
         {% end %}
     end
 

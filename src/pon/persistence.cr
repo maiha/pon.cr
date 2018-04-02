@@ -7,47 +7,51 @@ module Pon::Persistence(T, P)
     @updated_at : Time?
     @created_at : Time?
 
-    # The save method will check to see if the primary exists yet. If it does it
-    # will call the update method, otherwise it will call the create method.
-    # This will update the timestamps apropriately.
-    def save
+    def save(*args)
+      create_or_update(*args)
+    rescue Pon::RecordInvalid
+      false
+    end
+
+    def create_or_update(*args)
       return false unless valid?
 
       begin
         __run_before_save
+        table_name = self.class.table_name
         now = Time.now.to_utc
 
-        if (value = @{{primary_name}}) && !new_record?
+        if (pk = @{{primary_name}}) && !new_record?
           __run_before_update
-          @updated_at = now
+          # @updated_at = now
           fields = self.class.content_field_names
-          params = content_values + [value]
+          params = content_values + [pk]
 
           begin
-            self.class.adapter.update @@table_name, @@primary_name, fields, params
+            self.class.adapter.update table_name, "{{primary_name}}", fields, params
           rescue err
             raise DB::Error.new(err.message)
           end
           __run_after_update
         else
           __run_before_create
-          @created_at = @updated_at = now
+          # @created_at = @updated_at = now
           fields = self.class.content_field_names.dup
           params = content_values
-          if value = @{{primary_name}}
+          if pk = @{{primary_name}}
             fields << "{{primary_name}}"
-            params << value
+            params << pk
           end
           begin
             {% if primary_type.id == "Int32" %}
-              @{{primary_name}} = self.class.adapter.insert(@@table_name, fields, params, lastval: true).to_i32
+              @{{primary_name}} = self.class.adapter.insert(table_name, fields, params, lastval: true).to_i32
             {% elsif primary_type.id == "Int64" %}
-              @{{primary_name}} = self.class.adapter.insert(@@table_name, fields, params, lastval: true)
+              @{{primary_name}} = self.class.adapter.insert(table_name, fields, params, lastval: true)
             {% elsif primary_auto == true %}
               {% raise "Failed to define #{@type.name}#save: Primary key must be Int(32|64), or set `auto: false` for natural keys.\n\n  primary #{primary_name} : #{primary_type}, auto: false\n" %}
             {% else %}
               if @{{primary_name}}
-                self.class.adapter.insert(@@table_name, fields, params, lastval: false)
+                self.class.adapter.insert(table_name, fields, params, lastval: false)
               else
                 message = "Primary key('{{primary_name}}') cannot be null"
                 errors << Pon::FieldError.new("{{primary_name}}", message)
@@ -91,16 +95,17 @@ module Pon::Persistence(T, P)
     end
 
     def self.create(**args)
-      create(args.to_h)
+      object = new(args.to_h)
+      object.save
+      object
     end
-
-    def self.create(args : Hash(Symbol | String, DB::Any))
-      instance = new
-      instance.set_attributes(args)
-      instance.save
-      instance
+    
+    def self.create!(**args)
+      object = new(args.to_h)
+      object.save || raise Pon::RecordInvalid.new(object)
+      object
     end
-
+    
     # Returns true if this object hasn't been saved yet.
     getter? new_record : Bool = true
 

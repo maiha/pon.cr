@@ -10,6 +10,10 @@ module Pon
   end
   
   class RecordInvalid < Error
+    def initialize(@record : Model? = nil)
+      message = "Record invalid"
+      super(message)
+    end
   end
   
   class RecordNotFound < Error

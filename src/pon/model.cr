@@ -12,7 +12,7 @@ class Pon::Model
 
       include Pon::Validations(Types, {{PRIMARY[:type]}})
       include Pon::Persistence(Types, {{PRIMARY[:type]}})
-      include Pon::Finder(Types, {{PRIMARY[:type]}})
+      include Pon::Finder(Types)
     end
   end
 end
