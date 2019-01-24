@@ -16,7 +16,7 @@ spec:
 
 .PHONY : check_version_mismatch
 check_version_mismatch: shard.yml README.md
-	diff -w -c <(grep version: README.md) <(grep ^version: shard.yml)
+	diff -w -c <(grep version: README.md | head -1) <(grep ^version: shard.yml)
 
 .PHONY : version
 version:

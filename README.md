@@ -1,4 +1,4 @@
-# pon.cr
+# pon.cr [![Build Status](https://travis-ci.org/maiha/pon.cr.svg?branch=master)](https://travis-ci.org/maiha/pon.cr)
 
 Maiha's private ORM for [Crystal](http://crystal-lang.org/).
 
