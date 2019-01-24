@@ -3,7 +3,7 @@ require "logger"
 
 # shards
 require "db"
-require "lucky_inflector"
+require "wordsmith"
 
 # library
 require "./pon/*"

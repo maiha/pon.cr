@@ -17,7 +17,7 @@ module Pon::Core
       {% if SETTINGS[:table_name] %}
         {{ SETTINGS[:table_name].stringify }}
       {% else %}
-        LuckyInflector::Inflector.tableize({{ @type.name.id.stringify }}).gsub("/","_")
+        Wordsmith::Inflector.tableize({{ @type.name.id.stringify }}).gsub("/","_")
       {% end %}
     def self.table_name
       @@table_name

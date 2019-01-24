@@ -12,7 +12,7 @@ test: check_version_mismatch spec
 
 .PHONY : spec
 spec:
-	crystal spec -v --fail-fast
+	docker-compose run --rm crystal crystal spec -v --fail-fast
 
 .PHONY : check_version_mismatch
 check_version_mismatch: shard.yml README.md

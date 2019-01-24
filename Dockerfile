@@ -1,12 +1,6 @@
-FROM crystallang/crystal:0.24.2
+FROM crystallang/crystal:0.27.0
 
 RUN apt-get update -qq && apt-get install -y --no-install-recommends libpq-dev libsqlite3-dev libmysqlclient-dev
 
-ADD . /mnt
-
-WORKDIR /mnt
-
-RUN shards update
-
-CMD ["crystal", "spec"]
+CMD ["crystal", "--version"]
 

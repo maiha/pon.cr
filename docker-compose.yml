@@ -1,0 +1,24 @@
+version: '2'
+services:
+  crystal:
+    build: .
+    command: 'bash -c "sleep 5 && crystal spec"'
+    volumes:
+      - .:/mnt
+    working_dir: /mnt
+    environment:
+      PG_URL: 'postgres://postgres:@pg:5432/postgres'
+      MYSQL_URL: 'mysql://user:pass@mysql:3306/test'
+      SQLITE_URL: 'sqlite3:/tmp/test.db'
+    depends_on:
+      - pg
+      - mysql
+  pg:
+    image: postgres:9.5
+  mysql:
+    image: mysql:5.6
+    environment:
+      MYSQL_ROOT_PASSWORD: pass
+      MYSQL_DATABASE: test
+      MYSQL_USER: user
+      MYSQL_PASSWORD: pass
