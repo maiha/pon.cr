@@ -44,11 +44,21 @@ abstract class Pon::Adapter::RDB < Pon::Adapter
 
     getter db : ::DB::Database
 
-    def initialize(klass, @table_name : String, @primary_name : String, @setting : Setting = Setting.new)
-      @setting.default = self.class.setting
+    def initialize(klass, @table_name : String, @primary_name : String, @setting : Setting)
+      # bind class setting to default only if default is not set
+      if @setting.default? == nil
+        @setting.default = self.class.setting
+      end
+
       @qt = quote(@table_name)
       @qp = quote(@primary_name)
       @db = ::DB.open(@setting.url)
+      @db.setup_connection do |con|
+        if sql = @setting.init_connect?
+          logger.debug "[INIT_CONNECT] #{sql}"
+          con.exec(sql)
+        end
+      end
     end
 
     # NOTE: all "?" appeared in query part will be replaced when params exist

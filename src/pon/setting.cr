@@ -10,6 +10,8 @@ class Pon::Setting < TOML::Config
   int init_pool_size
   int max_pool_size
 
+  str init_connect
+  
   ######################################################################
   ### default
 

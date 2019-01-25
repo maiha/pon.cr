@@ -3,9 +3,10 @@ require "sqlite3"
 # Sqlite implementation of the Adapter
 class Pon::Adapter::Sqlite < Pon::Adapter::RDB
   SETTING = <<-TOML
-    url = "sqlite3:test.sqlite3"
+    url            = "sqlite3:test.sqlite3"
     init_pool_size = 1
     max_pool_size  = 5
+    init_connect   = "PRAGMA read_uncommitted = true;"
     TOML
 
   QUOTE     = '"'
