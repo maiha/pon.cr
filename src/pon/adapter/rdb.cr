@@ -55,7 +55,7 @@ abstract class Pon::Adapter::RDB < Pon::Adapter
       @db = ::DB.open(@setting.url)
       @db.setup_connection do |con|
         if sql = @setting.init_connect?
-          logger.debug "[INIT_CONNECT] #{sql}"
+          query_log "#{sql}", "init_connect"
           con.exec(sql)
         end
       end
@@ -64,23 +64,25 @@ abstract class Pon::Adapter::RDB < Pon::Adapter
     # NOTE: all "?" appeared in query part will be replaced when params exist
     def exec(query : String, params = [] of String)
       query = underlying_prepared(query) if params.any?
-      logger.info "#{query}: #{params}"
+      query_log "#{query}: #{params}", "exec"
       db.exec query, params
     end
 
     def count : Int32
-      scalar("SELECT COUNT(*) FROM #{@qt}").to_s.to_i32
+      query = "SELECT COUNT(*) FROM #{@qt}"
+      query_log query, "count"
+      scalar(query).to_s.to_i32
     end
 
     def all(fields : Array(String), as types : Tuple, limit : Int32? = nil)
       query = select_statement(fields: fields, limit: limit)
-      logger.info "#{query}"
+      query_log query, "all"
       query_all query, as: types
     end
     
     def one?(id, fields : Array(String), as types : Tuple)
       query = select_statement(fields: fields, where: "#{@qp} = ?", limit: 1)
-      logger.info "#{query}: #{id}"
+      query_log query, "one?"
       query_one? query, id, as: types
     end
 
@@ -109,7 +111,7 @@ abstract class Pon::Adapter::RDB < Pon::Adapter
     def lastval : Int64
       scalar(LAST_VAL).as(Int64)
     end
-    
+
     protected def select_statement(fields : Array(String), where : String? = nil, limit : Int32? = nil)
       stmt = String.build do |s|
         s << "SELECT "

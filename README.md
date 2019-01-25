@@ -74,6 +74,13 @@ class Pon::Model
   def foo? : T?
 ```
 
+## API : Module
+
+```crystal
+Pon.logger=(v : Logger)      # logger
+Pon.query_logging=(v : Bool) # writes queries into the logger or not
+```
+
 ## Roadmap
 
 - Adapter Core

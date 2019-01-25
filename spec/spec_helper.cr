@@ -17,6 +17,7 @@ if url = ENV["SQLITE_URL"]?
 end
 
 Pon.logger = Logger.new(File.open("spec.log", "w+"))
+# Pon.query_logging = false
 
 ADAPTERS = ["mysql","pg","sqlite"]
 

@@ -4,6 +4,8 @@ module Pon::Core
     {% primary_type = PRIMARY[:type] %}
     {% primary_auto = PRIMARY[:auto] %}
 
+    delegate log_query, to: self.class.adapter
+    
     ######################################################################
     ### self.primary_name
     @@primary_name = "{{primary_name}}"
