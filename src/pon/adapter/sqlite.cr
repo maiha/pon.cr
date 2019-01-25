@@ -2,7 +2,12 @@ require "sqlite3"
 
 # Sqlite implementation of the Adapter
 class Pon::Adapter::Sqlite < Pon::Adapter::RDB
-  URL       = "sqlite3:test.sqlite3"
+  SETTING = <<-TOML
+    url = "sqlite3:test.sqlite3"
+    init_pool_size = 1
+    max_pool_size  = 5
+    TOML
+
   QUOTE     = '"'
   BIND_TYPE = BindType::Question
   LAST_VAL  = "SELECT LAST_INSERT_ROWID()"

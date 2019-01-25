@@ -10,9 +10,15 @@ dependencies:
   db:
     github: crystal-lang/crystal-db
     version: ~> 0.5.1
+  toml-config:
+    github: maiha/toml-config.cr
+    version: ">= 0.4.0"
   wordsmith:
     github: luckyframework/wordsmith
     version: ~> 0.2
+  var:
+    github: maiha/var.cr
+    version: ">= 1.2.0"
 
 development_dependencies:
   mysql:

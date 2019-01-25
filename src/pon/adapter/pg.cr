@@ -2,7 +2,12 @@ require "pg"
 
 # PostgreSQL implementation of the Adapter
 class Pon::Adapter::Pg < Pon::Adapter::RDB
-  URL       = "postgres://postgres:@127.0.0.1:5432/postgres"
+  SETTING = <<-TOML
+    url = "postgres://postgres:@127.0.0.1:5432/postgres"
+    init_pool_size = 1
+    max_pool_size  = 5
+    TOML
+
   QUOTE     = '"'
   BIND_TYPE = BindType::Dollar
   LAST_VAL  = "SELECT LASTVAL()"

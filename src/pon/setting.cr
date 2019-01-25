@@ -1,13 +1,27 @@
-class Pon::Setting < Hash(String, String)
-  private macro named_accessor(name)
-    def {{name}}
-      self[{{name.stringify}}].to_s
-    end
-
-    def {{name}}=(v)
-      self[{{name.stringify}}] = v
-    end
+class Pon::Setting < TOML::Config
+  def self.new
+    new(TOML.parse(""))
   end
 
-  named_accessor url
+  ######################################################################
+  ### fields
+
+  str url
+  int init_pool_size
+  int max_pool_size
+
+  ######################################################################
+  ### default
+
+  var default : Setting
+
+  def [](key)
+    key = key.to_s
+    @paths.fetch(key) { default? ? default[key] : not_found(key) }
+  end
+
+  def []?(key)
+    key = key.to_s
+    @paths.fetch(key) { default? ? default[key]? : nil }
+  end
 end

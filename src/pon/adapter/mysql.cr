@@ -1,7 +1,12 @@
 require "mysql"
 
 class Pon::Adapter::Mysql < Pon::Adapter::RDB
-  URL       = "mysql://root@127.0.0.1:3306/mysql"
+  SETTING = <<-TOML
+    url = "mysql://root@127.0.0.1:3306/mysql"
+    init_pool_size = 1
+    max_pool_size  = 5
+    TOML
+
   QUOTE     = '`'
   BIND_TYPE = BindType::Question
   LAST_VAL  = "SELECT LAST_INSERT_ID()"

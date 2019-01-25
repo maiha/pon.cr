@@ -22,7 +22,7 @@ abstract class Pon::Adapter::RDB < Pon::Adapter
     Dollar   = 2                # "$1", "$2", ...
   end
 
-  # URL       = "" # This should be defined in subclasses
+  # SETTING = "" # This should be defined in subclasses
   QUOTE     = '"'
   BIND_TYPE = BindType::Question
   LAST_VAL  = "SELECT LAST_INSERT_ROWID()"
@@ -37,17 +37,18 @@ abstract class Pon::Adapter::RDB < Pon::Adapter
     "Time"    => "TIMESTAMP",
   }
 
-  # Use macro in order to resolve subclass constants.
+  # Use macro in order to resolve subclass constants like `SETTING`, `QUOTE`
   macro inherited
     @qt : String                # quoted table name
     @qp : String                # quoted primary name
 
     getter db : ::DB::Database
 
-    def initialize(klass, @table_name : String, @primary_name : String, @setting : Setting? = nil)
+    def initialize(klass, @table_name : String, @primary_name : String, @setting : Setting = Setting.new)
+      @setting.default = self.class.setting
       @qt = quote(@table_name)
       @qp = quote(@primary_name)
-      @db = ::DB.open(setting("url"))
+      @db = ::DB.open(@setting.url)
     end
 
     # NOTE: all "?" appeared in query part will be replaced when params exist
@@ -156,9 +157,8 @@ abstract class Pon::Adapter::RDB < Pon::Adapter
     end
 
     def self.setting
-      @@setting ||= Setting.new
+      @@setting ||= Setting.new(TOML.parse(SETTING))
     end
-    setting.url = URL
     
     private def setting(key : String)
       setting = @setting || self.class.setting
