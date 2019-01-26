@@ -2,9 +2,15 @@ require "mysql"
 
 class Pon::Adapter::Mysql < Pon::Adapter::RDB
   SETTING = <<-TOML
+    name = "mysql"
+
     url = "mysql://root@127.0.0.1:3306/mysql"
     init_pool_size = 1
     max_pool_size  = 5
+
+    [query]
+    show_databases = "SHOW DATABASES"
+    show_tables = "SHOW TABLES"
     TOML
 
   QUOTE     = '`'

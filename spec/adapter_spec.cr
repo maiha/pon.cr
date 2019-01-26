@@ -29,3 +29,24 @@ describe "Adapter" do
     end
   end
 end
+
+
+{% for adapter in ADAPTERS %}
+module {{adapter.upcase.id}}
+  describe "[{{adapter.upcase.id}}](ODBC)" do
+
+    describe "#databases" do
+      it "returns database names as Array(String)" do
+        Job.adapter.databases.should be_a(Array(String))
+      end
+    end
+
+    describe "#tables" do
+      it "returns table names as Array(String)" do
+        Job.adapter.tables.should contain("jobs")
+      end
+    end
+
+  end
+end
+{% end %}

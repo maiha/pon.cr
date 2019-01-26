@@ -14,6 +14,10 @@ abstract class Pon::Adapter::RDB < Pon::Adapter
   abstract def delete : Nil
   abstract def truncate : Nil
 
+  # odbc
+  abstract def databases : Array(String)
+  abstract def tables : Array(String)
+
   delegate quote, to: self.class
   delegate query_one?, query_all, scalar, to: db
 
@@ -59,6 +63,18 @@ abstract class Pon::Adapter::RDB < Pon::Adapter
           con.exec(sql)
         end
       end
+    end
+
+    ### ODBC
+
+    def databases : Array(String)
+      query = @setting.query_show_databases
+      query_all query, as: String
+    end
+
+    def tables : Array(String)
+      query = @setting.query_show_tables
+      query_all query, as: String
     end
 
     # NOTE: all "?" appeared in query part will be replaced when params exist
@@ -170,11 +186,6 @@ abstract class Pon::Adapter::RDB < Pon::Adapter
 
     def self.setting
       @@setting ||= Setting.new(TOML.parse(SETTING))
-    end
-    
-    private def setting(key : String)
-      setting = @setting || self.class.setting
-      setting[key]? || raise ArgumentError.new("#{self.class}.setting.#{key} not found")
     end
   end
 end

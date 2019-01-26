@@ -1,16 +1,17 @@
 class Pon::Setting < TOML::Config
-  def self.new
-    new(TOML.parse(""))
-  end
-
   ######################################################################
   ### fields
 
+  str name
+  
   str url
   int init_pool_size
   int max_pool_size
 
   str init_connect
+
+  str "query/show_databases"
+  str "query/show_tables"
   
   ######################################################################
   ### default
@@ -25,5 +26,17 @@ class Pon::Setting < TOML::Config
   def []?(key)
     key = key.to_s
     @paths.fetch(key) { default? ? default[key]? : nil }
+  end
+
+  ######################################################################
+  ### core
+
+  def self.new
+    new(TOML.parse(""))
+  end
+
+  private def not_found(key)
+    clue = self.name? || "Setting"
+    raise NotFound.new("setting not found: %s[%s]" % [clue, key])
   end
 end

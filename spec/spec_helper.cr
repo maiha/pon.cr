@@ -34,5 +34,7 @@ module {{adapter.upcase.id}}
     field   time : Time::Span
   end
 
+  Job.migrate!
+  
 end
 {% end %}

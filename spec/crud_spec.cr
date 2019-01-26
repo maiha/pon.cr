@@ -5,10 +5,6 @@ require "./spec_helper"
     describe "[{{adapter.upcase.id}}]" do
 
       describe "(CRUD)" do
-        it "(setup)" do
-          Job.migrate!
-        end
-        
         describe "Model.new" do
           it "works" do
             job = Job.new(name: "foo")

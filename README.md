@@ -35,6 +35,7 @@ job.save  # => true
   def lastval : Int64
   def scalar(*args)
 
+  # CRUD
   def insert(fields, params)
   def all(fields : Array(String), as types : Tuple, limit = nil)
   def one?(id, fields : Array(String), as types : Tuple)
@@ -42,6 +43,10 @@ job.save  # => true
   def delete(key) : Bool
   def delete : Nil
   def truncate : Nil
+
+  # ODBC
+  def databases : Array(String)
+  def tables : Array(String)
 ```
 
 ## API : Model
