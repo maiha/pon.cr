@@ -6,6 +6,7 @@ abstract class Pon::Adapter::RDB < Pon::Adapter
   abstract def exec(query : String, params = [] of String)
   abstract def lastval : Int64
   abstract def scalar(*args)
+  abstract def transaction(&block) : Nil
 
   abstract def insert(fields, params)
   abstract def all(fields : Array(String), as types : Tuple, limit = nil)
@@ -50,7 +51,7 @@ abstract class Pon::Adapter::RDB < Pon::Adapter
     getter db : ::DB::Database
     getter table_name
 
-    def initialize(klass, @table_name : String, @primary_name : String, @setting : Setting)
+    def initialize(klass, @table_name : String, @primary_name : String, @setting : ::Pon::Setting = ::Pon::Setting.new, db : ::DB::Database? = nil)
       # bind class setting to default only if default is not set
       if @setting.default? == nil
         @setting.default = self.class.setting
@@ -58,13 +59,7 @@ abstract class Pon::Adapter::RDB < Pon::Adapter
 
       @qt = quote(@table_name)
       @qp = quote(@primary_name)
-      @db = ::DB.open(@setting.url)
-      @db.setup_connection do |con|
-        if sql = @setting.init_connect?
-          query_log "#{sql}", "init_connect"
-          con.exec(sql)
-        end
-      end
+      @db = db || Pon::Adapter.database(@setting)
     end
 
     ### ODBC
@@ -84,6 +79,16 @@ abstract class Pon::Adapter::RDB < Pon::Adapter
       query = underlying_prepared(query) if params.any?
       query_log "#{query}: #{params}", "exec"
       db.exec query, params
+    end
+
+    def transaction(&block) : Nil
+      exec "BEGIN"
+      begin
+        yield
+        exec "COMMIT"
+      rescue
+        exec "ROLLBACK"
+      end
     end
 
     def count : Int32

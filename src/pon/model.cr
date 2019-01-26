@@ -3,7 +3,7 @@ require "./dsl"
 class Pon::Model
   include Dsl
   include Callbacks
-  
+
   macro inherited
     macro finished
       _finish_dsl

@@ -47,6 +47,9 @@ job.save  # => true
   # ODBC
   def databases : Array(String)
   def tables : Array(String)
+
+  # Experimental
+  def transaction(&block) : Nil # only sqlite and pg
 ```
 
 ## API : Model

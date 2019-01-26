@@ -3,7 +3,10 @@ require "./spec_helper"
 {% for adapter in ADAPTERS %}
   module {{adapter.upcase.id}}
     describe "[{{adapter.upcase.id}}]" do
-
+      it "(clean)" do
+        Job.delete_all
+      end
+      
       describe "(CRUD)" do
         describe "Model.new" do
           it "works" do

@@ -56,5 +56,22 @@ module {{adapter.upcase.id}}
     end
 
   end
+
+  describe "[{{adapter.upcase.id}}](Trasaction)" do
+
+    describe "#transaction" do
+      {% if adapter == "mysql" %}
+      pending "ensures transaction" do
+      {% else %}
+      it "ensures transaction" do
+      {% end %}
+        Job.adapter.transaction do
+          Job.create!(name: "1")
+          Job.create!(name: "2")
+        end
+      end
+    end
+
+  end
 end
 {% end %}
