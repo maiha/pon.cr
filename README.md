@@ -37,7 +37,7 @@ job.save  # => true
 
   # CRUD
   def insert(fields, params)
-  def all(fields : Array(String), as types : Tuple, limit = nil)
+  def all(fields : Array(String), as types : Tuple, where = nil, limit = nil)
   def one?(id, fields : Array(String), as types : Tuple)
   def count : Int32
   def delete(key) : Bool
@@ -64,12 +64,14 @@ class Pon::Model
   # Core
   def self.table_name : String
   def new_record? : Bool
+  def to_h : Hash(String, ALL_TYPES)
 
   # CRUD
   def self.create! : M
   def self.create : M
   def self.count : Int32
   def self.all : Array(M)
+  def self.where(condition : String) : Array(M)
   def self.first : M
   def self.first? : M?
   def save : Bool

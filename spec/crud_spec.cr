@@ -29,6 +29,16 @@ require "./spec_helper"
             3.times{|i| Job.create!(name: i)}
 
             Job.all.map(&.name).sort.should eq(["0", "1", "2"])
+
+            # respects where condition
+            Job.all(where: "name <> '1'").map(&.name).sort.should eq(["0", "2"])
+          end
+        end
+
+        describe "Model.where" do
+          it "acts same as all(where: ...)" do
+            # re-use above records
+            Job.where("name <> '1'").map(&.name).sort.should eq(["0", "2"])
           end
         end
 

@@ -97,8 +97,8 @@ abstract class Pon::Adapter::RDB < Pon::Adapter
       scalar(query).to_s.to_i32
     end
 
-    def all(fields : Array(String), as types : Tuple, limit : Int32? = nil)
-      query = select_statement(fields: fields, limit: limit)
+    def all(fields : Array(String), as types : Tuple, where : String? = nil, limit : Int32? = nil)
+      query = select_statement(fields: fields, where: where, limit: limit)
       query_log query, "all"
       query_all query, as: types
     end
