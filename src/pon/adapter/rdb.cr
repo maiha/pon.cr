@@ -1,6 +1,7 @@
 # base class for crystal-db
 abstract class Pon::Adapter::RDB < Pon::Adapter
   abstract def db : ::DB::Database
+  abstract def table_name : String
   abstract def logger : Logger
   abstract def exec(query : String, params = [] of String)
   abstract def lastval : Int64
@@ -47,6 +48,7 @@ abstract class Pon::Adapter::RDB < Pon::Adapter
     @qp : String                # quoted primary name
 
     getter db : ::DB::Database
+    getter table_name
 
     def initialize(klass, @table_name : String, @primary_name : String, @setting : Setting)
       # bind class setting to default only if default is not set

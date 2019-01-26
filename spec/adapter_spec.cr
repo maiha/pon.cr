@@ -1,6 +1,6 @@
 require "./spec_helper"
 
-private class MysqlFoo < Pon::Model
+private class MysqlFoo1 < Pon::Model
   adapter mysql
 end
 
@@ -17,7 +17,7 @@ end
 describe "Adapter" do
   describe ".quoted_table_name" do
     it "should quote with backtick" do
-      MysqlFoo.quoted_table_name.should eq("`mysql_foos`")
+      MysqlFoo1.quoted_table_name.should eq("`mysql_foo1s`")
     end
 
     it "should respect user setting" do
@@ -26,6 +26,14 @@ describe "Adapter" do
 
     it "should respect user setting with dotted string" do
       MysqlFoo3.quoted_table_name.should eq("`db1.foo3`")
+    end
+  end
+
+  describe "#table_name" do
+    it "returns table name" do
+      MysqlFoo1.adapter.table_name.should eq("mysql_foo1s")
+      MysqlFoo2.adapter.table_name.should eq("foo2")
+      MysqlFoo3.adapter.table_name.should eq("db1.foo3")
     end
   end
 end
