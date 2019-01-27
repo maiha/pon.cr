@@ -42,7 +42,6 @@ end
 {% for adapter in ADAPTERS %}
 module {{adapter.upcase.id}}
   describe "[{{adapter.upcase.id}}](ODBC)" do
-
     describe "#databases" do
       it "returns database names as Array(String)" do
         Job.adapter.databases.should be_a(Array(String))
@@ -54,11 +53,9 @@ module {{adapter.upcase.id}}
         Job.adapter.tables.should contain("jobs")
       end
     end
-
   end
 
   describe "[{{adapter.upcase.id}}](Trasaction)" do
-
     describe "#transaction" do
       {% if adapter == "mysql" %}
       pending "ensures transaction" do
@@ -71,7 +68,17 @@ module {{adapter.upcase.id}}
         end
       end
     end
+  end
 
+  describe "[{{adapter.upcase.id}}](Reset)" do
+    describe "#reset!" do
+      it "closes and re-builds connection" do
+        id1 = Job.adapter.database.object_id
+        Job.adapter.reset!
+        id2 = Job.adapter.database.object_id
+        id1.should_not eq(id2)
+      end
+    end
   end
 end
 {% end %}

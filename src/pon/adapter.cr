@@ -15,7 +15,8 @@ abstract class Pon::Adapter
     databases[setting.url] ||= build_database(setting)
   end
 
-  private def self.build_database(setting) : DB::Database
+  # used from instances
+  def self.build_database(setting) : DB::Database
     db = ::DB.open(setting.url)
     db.setup_connection do |con|
       if sql = setting.init_connect?
@@ -24,6 +25,13 @@ abstract class Pon::Adapter
       end
     end
     return db
+  end
+
+  def self.reset!(setting : Setting) : Nil
+    if db = databases[setting.url]?
+      db.close
+      databases.delete(setting.url)
+    end
   end
 end
 

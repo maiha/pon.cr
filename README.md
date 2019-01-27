@@ -34,6 +34,7 @@ job.save  # => true
   def exec(sql) : Nil
   def lastval : Int64
   def scalar(*args)
+  def reset! : Nil
 
   # CRUD
   def insert(fields, params)
@@ -103,6 +104,7 @@ Pon.query_logging=(v : Bool) # writes queries into the logger or not
   - [ ] escape
   - [x] migrator
 - Adapter Drivers
+  - [x] reset connections
   - RDB
     - [x] mysql
     - [x] pg

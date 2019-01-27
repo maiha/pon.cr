@@ -1,12 +1,12 @@
 # base class for crystal-db
 abstract class Pon::Adapter::RDB < Pon::Adapter
-  abstract def db : ::DB::Database
   abstract def table_name : String
   abstract def logger : Logger
   abstract def exec(query : String, params = [] of String)
   abstract def lastval : Int64
   abstract def scalar(*args)
   abstract def transaction(&block) : Nil
+  abstract def reset! : Nil
 
   abstract def insert(fields, params)
   abstract def all(fields : Array(String), as types : Tuple, limit = nil)
@@ -21,7 +21,7 @@ abstract class Pon::Adapter::RDB < Pon::Adapter
   abstract def tables : Array(String)
 
   delegate quote, to: self.class
-  delegate query_one?, query_all, scalar, to: db
+  delegate query_one?, query_all, scalar, to: database
 
   enum BindType
     Question = 1                # "?"
@@ -48,10 +48,9 @@ abstract class Pon::Adapter::RDB < Pon::Adapter
     @qt : String                # quoted table name
     @qp : String                # quoted primary name
 
-    getter db : ::DB::Database
     getter table_name
 
-    def initialize(klass, @table_name : String, @primary_name : String, @setting : ::Pon::Setting = ::Pon::Setting.new, db : ::DB::Database? = nil)
+    def initialize(klass, @table_name : String, @primary_name : String, @setting : ::Pon::Setting = ::Pon::Setting.new, @db : ::DB::Database? = nil)
       # bind class setting to default only if default is not set
       if @setting.default? == nil
         @setting.default = self.class.setting
@@ -59,11 +58,26 @@ abstract class Pon::Adapter::RDB < Pon::Adapter
 
       @qt = quote(@table_name)
       @qp = quote(@primary_name)
-      @db = db || Pon::Adapter.database(@setting)
     end
 
-    ### ODBC
+    # `database` abstracts unique connections and access to shared connections.
+    # Querying each time accessing without caching slightly degrades performance,
+    # but this mechanism is required when resetting shared connections.
+    def database : ::DB::Database
+      @db || Pon::Adapter.database(@setting)
+    end
 
+    def reset! : Nil
+      if db = @db
+        db.close
+        @db = Pon::Adapter.build_database(@setting)
+      else
+        Pon::Adapter.reset!(@setting)
+      end
+    end
+    
+    ### ODBC
+    
     def databases : Array(String)
       query = @setting.query_show_databases
       query_all query, as: String
@@ -78,7 +92,7 @@ abstract class Pon::Adapter::RDB < Pon::Adapter
     def exec(query : String, params = [] of String)
       query = underlying_prepared(query) if params.any?
       query_log "#{query}: #{params}", "exec"
-      db.exec query, params
+      database.exec query, params
     end
 
     def transaction(&block) : Nil
