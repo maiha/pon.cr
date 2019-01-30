@@ -2,19 +2,13 @@ require "spec"
 require "../src/pon"
 
 require "../src/pon/adapter/mysql"
-if url = ENV["MYSQL_URL"]?
-  Pon::Adapter::Mysql.setting.url = url
-end
+Pon::Adapter::Mysql.setting.url = ENV["MYSQL_URL"]?
 
 require "../src/pon/adapter/pg"
-if url = ENV["PG_URL"]?
-  Pon::Adapter::Pg.setting.url = url
-end
+Pon::Adapter::Pg.setting.url = ENV["PG_URL"]?
 
 require "../src/pon/adapter/sqlite"
-if url = ENV["SQLITE_URL"]?
-  Pon::Adapter::Sqlite.setting.url = url
-end
+Pon::Adapter::Sqlite.setting.url = ENV["SQLITE_URL"]?
 
 Pon.logger = Logger.new(File.open("spec.log", "w+"))
 # Pon.query_logging = false
