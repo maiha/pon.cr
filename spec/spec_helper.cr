@@ -20,12 +20,18 @@ ADAPTERS = ["mysql","pg","sqlite"]
 {% for adapter in ADAPTERS %}
 module {{adapter.upcase.id}}
 
+  enum Code
+    OK  = 200
+    ERR = 500
+  end
+  
   class Job < Pon::Model
     adapter {{adapter.id}}
     table_name jobs
     primary id : Int32
     field   name : String
-    field   time : Time::Span
+    field   time : Time
+    field   code : Code
   end
 
   Job.migrate!

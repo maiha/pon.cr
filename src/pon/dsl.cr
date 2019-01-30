@@ -42,14 +42,31 @@ module Pon::Dsl
     {% primary_type = PRIMARY[:type] %}
 
     # merge PK and CONTENT_FIELDS into ALL_FIELDS
-    {% ALL_FIELDS[primary_name] = {name: primary_name, type: primary_type} %}
+    #   db: db type
+    #   sp: the name of special type that differs between crystal and db
+    {% ALL_FIELDS[primary_name] = {name: primary_name, type: primary_type, db: primary_type, sp: :none } %}
     {% for name, h in CONTENT_FIELDS %}
-      {% ALL_FIELDS[name] = {name: name, type: h[:type]} %}
+      {% typ = h[:type].resolve %}
+      {% enm = (typ < Enum) %}
+      {% sp  = enm ? :enum      : ( (typ == Time::Span) ? :span : :none ) %}
+      {% db  = enm ? "Int32".id : ( (typ == Time::Span) ? "Time".id : h[:type] ) %}
+      {% ALL_FIELDS[name] = {name: name, type: h[:type], db: db, sp: sp} %}
     {% end %}
 
     # Create the properties
     {% for name, h in ALL_FIELDS %}
       property? {{name}} : {{h[:type]}}?
+
+      {% if h[:sp] == :enum %}
+        def {{name.id}}=(v : Int32)
+          self.{{name}} = {{h[:type]}}.from_value(v)
+        end
+      {% elsif h[:sp] == :span %}
+        def {{name.id}}=(v : String)
+          self.{{name}} = Time::Span.parse(v)
+        end
+      {% end %}
+
       def {{name.id}}
         raise {{@type.name.stringify}} + "#" + {{name.stringify}} + " cannot be nil" if @{{name.id}}.nil?
         @{{name.id}}.not_nil!
@@ -57,6 +74,7 @@ module Pon::Dsl
     {% end %}
    
     alias Types = {{ (ALL_FIELDS.values.map{|h| h[:type].stringify} + ["Nil"]).sort.join("|").id }}
+    alias DBTypes = {{ (ALL_FIELDS.values.map{|h| h[:db].stringify} + ["Nil"]).sort.join("|").id }}
 
     def initialize(**args : Object)
       set_attributes(args.to_h)

@@ -25,6 +25,15 @@ module Pon::Cast
     value.to_s
   end
 
+  def cast(value, type : Enum.class)
+    case value
+    when Int32 ; type.from_value(value.as(Int32).to_i64)
+    when Int64 ; type.from_value(value.to_i64)
+    when Enum  ; value
+    else       ;  raise ArgumentError.new("cast error: #{type} <= '#{value}'")
+    end
+  end
+
   def cast(value, type : Time::Span.class)
     case value.to_s
     when ""
@@ -33,6 +42,15 @@ module Pon::Cast
       Time::Span.new($1.to_i, $2.to_i, $3.to_i)
     else
       raise "cannot cast '#{value}' to Time::Span"
+    end
+  end
+
+  def cast(value, type : Time.class)
+    case value
+    when Time
+      return value
+    else
+      raise "cannot cast '#{value}' to Time"
     end
   end
 

@@ -8,12 +8,18 @@ Maiha's private ORM for [Crystal](http://crystal-lang.org/).
 
 ```crystal
 require "pon"
-require "pon/adapter/mysql"
+require "pon/adapter/mysql"  # "mysql", "pg", "sqlite"
+
+enum Code
+  OK  = 200
+  ERR = 500
+end
 
 class Job < Pon::Model
-  adapter mysql
+  adapter mysql              # "mysql", "pg", "sqlite"
   field   name : String
-  field   time : Time::Span
+  field   time : Time
+  field   code : Code
 end
 
 Pon::Adapter::Mysql.setting.url = "mysql://root@127.0.0.1:3306/test"
@@ -21,11 +27,12 @@ Job.migrate! # drop and create the table
 
 Job.count # => 0
 
-job = Job.new(name: "foo")
+job = Job.new(name: "foo", code: Code::OK)
 job.name  # => "foo"
 job.time? # => nil
-
 job.save  # => true
+
+Job.find(job.id).code.ok? # => true
 ```
 
 ## API : Adapter
@@ -113,6 +120,7 @@ Pon.query_logging=(v : Bool) # writes queries into the logger or not
     - [ ] redis
 - Core
   - [x] pluralize table names
+  - [x] special types (Enum)
   - [ ] custom type
   - [x] multibytes
   - [x] record status

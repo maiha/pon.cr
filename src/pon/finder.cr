@@ -1,12 +1,12 @@
 module Pon::Finder
   macro included
-    {% all_tuple = { ALL_FIELDS.values.map{|h| h[:type].stringify + "?"}.join(",").id } %}
+    {% db_tuple = { ALL_FIELDS.values.map{|h| h[:db].stringify + "?"}.join(",").id } %}
     def self.count
       adapter.count
     end
 
     def self.all(where : String? = nil, limit : Int32? = nil)
-      adapter.all(fields: field_names, as: {{ all_tuple }}, where: where, limit: limit).map{|t| new(t)}
+      adapter.all(fields: field_names, as: {{ db_tuple }}, where: where, limit: limit).map{|t| new(t)}
     end
 
     def self.where(condition : String, limit : Int32? = nil)
@@ -14,7 +14,7 @@ module Pon::Finder
     end
 
     def self.first?
-      adapter.all(fields: field_names, limit: 1, as: {{ all_tuple }}).map{|t| new(t)}.first?
+      adapter.all(fields: field_names, limit: 1, as: {{ db_tuple }}).map{|t| new(t)}.first?
     end
 
     def self.first
@@ -26,7 +26,7 @@ module Pon::Finder
     end
 
     def self.find?(id : {{PRIMARY[:type]}}) : {{@type}}?
-      if tuple = adapter.one?(id, fields: field_names, as: {{ all_tuple }})
+      if tuple = adapter.one?(id, fields: field_names, as: {{ db_tuple }})
         new(tuple)
       else
         nil

@@ -14,6 +14,7 @@ require "./spec_helper"
             job.id?.should eq(nil)
             job.name.should eq("foo")
             job.time?.should eq(nil)
+            job.code?.should eq(nil)
           end
         end
 
@@ -26,12 +27,23 @@ require "./spec_helper"
         describe "Model.all" do
           it "returns all records" do
             Job.delete_all
-            3.times{|i| Job.create!(name: i)}
+            now = Time.now
+            Job.create!(name: 0, time: now, code: Code::OK)
+            Job.create!(name: 1, time: now, code: Code::OK)
+            Job.create!(name: 2, time: now, code: Code::ERR)
 
             Job.all.map(&.name).sort.should eq(["0", "1", "2"])
+            Job.all.map(&.code).uniq.sort.should eq([Code::OK, Code::ERR])
 
             # respects where condition
             Job.all(where: "name <> '1'").map(&.name).sort.should eq(["0", "2"])
+          end
+
+          it "works with content_values without overloads error" do
+            # no overload matches 'Array(Code | Int64 | Nil)#<<' with type Int32
+            # Overloads are:
+            # - Array(T)#<<(value : T)
+            Job.all.map(&.content_values)
           end
         end
 

@@ -49,10 +49,6 @@ module Pon::Migrator
       end
     
       def create
-        resolve = ->(key : String) {
-          {{adapter}}.class.raw_type?(key) || raise "Migrator(#{ {{adapter}}.class.name }) doesn't support '#{key}' yet."
-        }
-
         stmt = String.build do |s|
           s.puts "CREATE TABLE #{ @quoted_table_name }("
 
@@ -60,24 +56,33 @@ module Pon::Migrator
           k = {{adapter}}.quote("{{primary_name}}")
           v =
             {% if primary_auto %}
-              resolve.call("AUTO_{{primary_type.id}}")
+              resolve("AUTO_{{primary_type.id}}")
             {% else %}
-              resolve.call("{{primary_type}}")
+              resolve("{{primary_type}}")
             {% end %}
           s.print "#{k} #{v}"
 
           # content fields
-          {% for name, h in CONTENT_FIELDS %}
-            s.puts ","
-            k = {{adapter}}.quote("{{name}}")
-            v = resolve.call("{{h[:type]}}")
-            s.puts "#{k} #{v}"
+          # use `ALL_FIELDS` because `CONTENT_FIELDS` doesn't contain `h[:db]`
+          {% for name, h in ALL_FIELDS %}
+            {% if name != primary_name %}
+              s.puts ","
+              k = {{adapter}}.quote("{{name}}")
+              v = resolve("{{h[:db]}}")
+              s.puts "#{k} #{v}"
+            {% end %}
           {% end %}
 
           s.puts ") #{@table_options};"
         end
-
         exec stmt
+      end
+
+      private def resolve(key : String)
+        if key =~ /Code$/
+          return resolve("Int32")
+        end
+        {{adapter}}.class.raw_type?(key) || raise "Migrator(#{ {{adapter}}.class.name }) doesn't support '#{key}' yet."
       end
     end
     

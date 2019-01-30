@@ -61,12 +61,17 @@ module Pon::Core
     ### current values
 
     def content_values
-      parsed_params = [] of Types
+      parsed_params = [] of DBTypes
       {% for name, type in CONTENT_FIELDS %}
-        {% if type.id == Time.id %}
-          parsed_params << {{name.id}}?.try(&.to_s("%F %X"))
+        _{{name.id}} = {{name.id}}?
+        {% if type.id == Time.id || type.id == Time::Span %}
+          parsed_params << _{{name.id}}.try(&.to_s("%F %X"))
         {% else %}
-          parsed_params << {{name.id}}?
+          if _{{name.id}}.is_a?(Enum)
+            parsed_params << _{{name.id}}.value
+          else
+            parsed_params << _{{name.id}}
+          end
         {% end %}
       {% end %}
       return parsed_params
