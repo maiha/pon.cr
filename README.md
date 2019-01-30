@@ -150,7 +150,7 @@ Add this to your application's `shard.yml`:
 dependencies:
   pon:
     github: maiha/pon.cr
-    version: 0.3.1
+    version: 0.4.0
 
   # one of following adapter
   mysql:
