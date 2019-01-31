@@ -28,6 +28,26 @@ module {{adapter.upcase.id}}
         job.to_h.should eq({"id" => 1, "name" => "foo", "time" => nil, "code" => nil})
       end
     end
+
+    describe "(type casting for DB)" do
+      it "db_serialize(field)" do
+        job = Job.new
+        job.db_serialize("name").should eq(nil)
+        job.db_serialize("time").should eq(nil)
+        job.db_serialize("code").should eq(nil)
+
+        job = Job.new(name: "http", time: Time.now, code: Code::OK)
+        job.db_serialize("name").should eq("http")
+        job.db_serialize("time").should be_a(Time)
+        job.db_serialize("code").should eq(200)
+      end
+
+      it "db_serialize_contents" do
+        job = Job.new(name: "http", code: Code::OK)
+        job.db_serialize_contents.should eq(["http", nil, 200])
+      end
+    end
+
   end
 end
 {% end %}

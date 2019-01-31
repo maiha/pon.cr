@@ -34,7 +34,7 @@ module Pon::Persistence
           __run_before_update
           # @updated_at = now
           fields = self.class.content_field_names
-          params = content_values + [pk]
+          params = db_serialize_contents + [pk]
 
           begin
             adapter.update(fields, params)
@@ -46,7 +46,7 @@ module Pon::Persistence
           __run_before_create
           # @created_at = @updated_at = now
           fields = self.class.content_field_names.dup
-          params = content_values
+          params = db_serialize_contents
           if pk = @{{primary_name}}
             fields << "{{primary_name}}"
             params << pk

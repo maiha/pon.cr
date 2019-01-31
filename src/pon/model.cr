@@ -10,6 +10,7 @@ class Pon::Model
 
       include Pon::Core
       include Pon::Validations
+      include Pon::Serializable
       include Pon::Persistence
       include Pon::Finder
       include Pon::Migrator

@@ -39,11 +39,11 @@ require "./spec_helper"
             Job.all(where: "name <> '1'").map(&.name).sort.should eq(["0", "2"])
           end
 
-          it "works with content_values without overloads error" do
+          it "works with db_serialize without overloads error" do
             # no overload matches 'Array(Code | Int64 | Nil)#<<' with type Int32
             # Overloads are:
             # - Array(T)#<<(value : T)
-            Job.all.map(&.content_values)
+            Job.all.map(&.db_serialize_contents)
           end
         end
 
