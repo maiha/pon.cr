@@ -76,6 +76,9 @@ module Pon::Dsl
     alias Types = {{ (ALL_FIELDS.values.map{|h| h[:type].stringify} + ["Nil"]).sort.join("|").id }}
     alias DBTypes = {{ (ALL_FIELDS.values.map{|h| h[:db].stringify} + ["Nil"]).sort.join("|").id }}
 
+    FIELD_NAMES = {{ ALL_FIELDS.values.map{|h| h[:name].stringify} }}
+    FIELD_NAMES_SET = FIELD_NAMES.to_set
+
     def initialize(**args : Object)
       set_attributes(args.to_h)
     end
@@ -138,5 +141,6 @@ module Pon::Dsl
         {% i = i + 1 %}
       {% end %}
     end
+
   end
 end

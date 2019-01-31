@@ -45,7 +45,7 @@ Job.find(job.id).code.ok? # => true
 
   # CRUD
   def insert(fields, params)
-  def all(fields : Array(String), as types : Tuple, where = nil, limit = nil)
+  def all(fields : Array(String), types, rest = nil, **opts)
   def one?(id, fields : Array(String), as types : Tuple)
   def count : Int32
   def delete(key) : Bool
@@ -90,6 +90,9 @@ class Pon::Model
   # Field "foo"
   def foo : T
   def foo? : T?
+
+  # Aggregations
+  def self.count_by_xxx : Hash(Type, Int64)
 ```
 
 ## API : Module
@@ -105,6 +108,7 @@ Pon.query_logging=(v : Bool) # writes queries into the logger or not
   - [x] connect lazily
   - [x] exec plain sql
   - [x] exec prepared statement
+  - [x] all
   - [x] count
   - [x] scalar
   - [x] quote
@@ -134,6 +138,8 @@ Pon.query_logging=(v : Bool) # writes queries into the logger or not
   - [x] delete, delete_all
   - [x] find
   - [x] save
+- Aggregations
+  - [x] count_by_xxx
 - Relations
   - [ ] belongs_to
   - [ ] has_many

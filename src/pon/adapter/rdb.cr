@@ -9,7 +9,7 @@ abstract class Pon::Adapter::RDB < Pon::Adapter
   abstract def reset! : Nil
 
   abstract def insert(fields, params)
-  abstract def all(fields : Array(String), as types : Tuple, limit = nil)
+  abstract def all(fields : Array(String), types, rest = nil, **opts)
   abstract def one?(id, fields : Array(String), as types : Tuple)
   abstract def count : Int32
   abstract def delete(key) : Bool
@@ -48,7 +48,7 @@ abstract class Pon::Adapter::RDB < Pon::Adapter
     @qt : String                # quoted table name
     @qp : String                # quoted primary name
 
-    getter table_name
+    getter table_name, qt, qp
 
     def initialize(klass, @table_name : String, @primary_name : String, @setting : ::Pon::Setting = ::Pon::Setting.new, @db : ::DB::Database? = nil)
       # bind class setting to default only if default is not set
@@ -111,14 +111,14 @@ abstract class Pon::Adapter::RDB < Pon::Adapter
       scalar(query).to_s.to_i32
     end
 
-    def all(fields : Array(String), as types : Tuple, where : String? = nil, limit : Int32? = nil)
-      query = select_statement(fields: fields, where: where, limit: limit)
+    def all(fields : Array(String), types, rest = nil, **opts)
+      query = select_statement(fields, rest, **opts)
       query_log query, "all"
       query_all query, as: types
     end
     
     def one?(id, fields : Array(String), as types : Tuple)
-      query = select_statement(fields: fields, where: "#{@qp} = ?", limit: 1)
+      query = select_statement(fields, where: "#{@qp} = ?", limit: 1)
       query_log query, "one?"
       query_one? query, id, as: types
     end
@@ -149,17 +149,29 @@ abstract class Pon::Adapter::RDB < Pon::Adapter
       scalar(LAST_VAL).as(Int64)
     end
 
-    protected def select_statement(fields : Array(String), where : String? = nil, limit : Int32? = nil)
+    protected def select_statement(fields : Array(String), rest : String? = nil, **opts)
       stmt = String.build do |s|
         s << "SELECT "
-        s << fields.map { |name| "#{@qt}.#{quote(name)}" }.join(", ")
+        s << fields.map { |name| quote_field(name) }.join(", ")
         s << " FROM #{@qt}"
-        s << " WHERE #{where}" if where
-        s << " LIMIT #{limit}" if limit
+        s << " #{rest}" if rest
+        opts.each do |k, v|
+          s << " #{k} #{v}" if v
+        end
       end
       return underlying_prepared(stmt)
     end
-   
+
+    def quote_field(name : String) : String
+      case name
+      when /^[a-z0-9_]+$/i
+        "#{@qt}.#{quote(name)}"
+      else
+        # Nop if not match because it should be functions such as "COUNT(*)"
+        name
+      end
+    end
+
     protected def underlying_prepared(stmt : String) : String
       case BIND_TYPE
       when .question?

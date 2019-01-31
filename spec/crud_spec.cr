@@ -28,15 +28,15 @@ require "./spec_helper"
           it "returns all records" do
             Job.delete_all
             now = Time.now
-            Job.create!(name: 0, time: now, code: Code::OK)
-            Job.create!(name: 1, time: now, code: Code::OK)
-            Job.create!(name: 2, time: now, code: Code::ERR)
+            Job.create!(name: 1, code: Code::OK)
+            Job.create!(name: 2, code: Code::OK)
+            Job.create!(name: 3, code: Code::ERR)
 
-            Job.all.map(&.name).sort.should eq(["0", "1", "2"])
+            Job.all.map(&.name).sort.should eq(["1", "2", "3"])
             Job.all.map(&.code).uniq.sort.should eq([Code::OK, Code::ERR])
 
             # respects where condition
-            Job.all(where: "name <> '1'").map(&.name).sort.should eq(["0", "2"])
+            Job.all(where: "name <> '2'").map(&.name).sort.should eq(["1", "3"])
           end
 
           it "works with db_serialize without overloads error" do
@@ -50,7 +50,7 @@ require "./spec_helper"
         describe "Model.where" do
           it "acts same as all(where: ...)" do
             # re-use above records
-            Job.where("name <> '1'").map(&.name).sort.should eq(["0", "2"])
+            Job.where("name <> '2'").map(&.name).sort.should eq(["1", "3"])
           end
         end
 

@@ -2,6 +2,9 @@ module Pon
   class Error < Exception
   end
 
+  class Bug < Error
+  end
+
   class FieldError < Error
     getter field
     def initialize(@field : String? = nil, msg : String? = nil)

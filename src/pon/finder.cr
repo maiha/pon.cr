@@ -5,8 +5,12 @@ module Pon::Finder
       adapter.count
     end
 
-    def self.all(where : String? = nil, limit : Int32? = nil)
-      adapter.all(fields: field_names, as: {{ db_tuple }}, where: where, limit: limit).map{|t| new(t)}
+    def self.all(fields : Array(String), types, rest = nil, **opts)
+      adapter.all(fields, types, rest, **opts)
+    end
+
+    def self.all(**opts)
+      adapter.all(field_names, {{ db_tuple }}, nil, **opts).map{|t| new(t)}
     end
 
     def self.where(condition : String, limit : Int32? = nil)
@@ -14,7 +18,7 @@ module Pon::Finder
     end
 
     def self.first?
-      adapter.all(fields: field_names, limit: 1, as: {{ db_tuple }}).map{|t| new(t)}.first?
+      all(limit: 1).first?
     end
 
     def self.first

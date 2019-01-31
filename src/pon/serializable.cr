@@ -33,6 +33,6 @@ module Pon::Serializable
       {% end %}
       return values
     end
-
+    
   end
 end
