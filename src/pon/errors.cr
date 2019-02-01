@@ -12,6 +12,9 @@ module Pon
     end
   end
   
+  class ValueNotFound < Error
+  end
+
   class RecordNotFound < Error
   end
 

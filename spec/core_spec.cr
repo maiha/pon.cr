@@ -29,6 +29,38 @@ module {{adapter.upcase.id}}
       end
     end
 
+    describe "Model#[key]" do
+      it "works" do
+        job = Job.new(name: "foo")
+        job["name"].should eq("foo")
+        expect_raises(Pon::ValueNotFound) { job["code"] }
+        expect_raises(ArgumentError     ) { job["xxx"]  }
+      end
+    end
+
+    describe "Model#[key]?" do
+      it "works" do
+        job = Job.new(name: "foo")
+        job["name"]?.should eq("foo")
+        job["code"]?.should eq(nil)
+        expect_raises(ArgumentError) { job["xxx"]? }
+      end
+    end
+
+    describe "Model#[key] = value" do
+      it "works" do
+        job = Job.new
+        job["name"] = "foo"
+        job["name"].should eq("foo")
+        job.name.should eq("foo")
+        job["code"] = Code::OK
+        job.code.should eq(Code::OK)
+        expect_raises(ArgumentError) {
+          job["xxx"] = 1
+        }
+      end
+    end
+
     describe "(type casting for DB)" do
       it "db_serialize(field)" do
         job = Job.new

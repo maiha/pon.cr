@@ -1,3 +1,5 @@
+require "./errors"
+
 module Pon::Dsl
   macro included
     macro inherited
@@ -68,7 +70,7 @@ module Pon::Dsl
       {% end %}
 
       def {{name.id}}
-        raise {{@type.name.stringify}} + "#" + {{name.stringify}} + " cannot be nil" if @{{name.id}}.nil?
+        raise ::Pon::ValueNotFound.new({{@type.name.stringify}} + "#" + {{name.stringify}} + " is nil") if @{{name.id}}.nil?
         @{{name.id}}.not_nil!
       end
     {% end %}
@@ -131,6 +133,40 @@ module Pon::Dsl
         self.{{name.id}} = result.read(Union({{h[:type].id}} | Nil))
       {% end %}
       return self
+    end
+
+    def [](field : String)
+      {% for name, h in ALL_FIELDS %}
+        return self.{{name}} if "{{name}}" == field
+      {% end %}
+      raise ArgumentError.new("#{self.class}#['#{field}']: invalid field name")
+    end
+
+    def []?(field : String)
+      {% for name, h in ALL_FIELDS %}
+        return self.{{name}}? if "{{name}}" == field
+      {% end %}
+      raise ArgumentError.new("#{self.class}#['#{field}']: invalid field name")
+    end
+
+    def []=(field : String, value : Nil)
+      {% for name, h in ALL_FIELDS %}
+        return self.{{name}} = nil if "{{name}}" == field
+      {% end %}
+      raise ArgumentError.new("#{self.class}#['#{field}']: invalid field name")
+    end
+
+    def []=(field : String, value)
+      {% for name, h in ALL_FIELDS %}
+        if "{{name}}" == field
+          if value.nil?
+            return self.{{name}} = nil
+          else
+            return self.{{name}} = ::Pon::Cast.cast(value.not_nil!, {{h[:type]}})
+          end
+        end
+      {% end %}
+      raise ArgumentError.new("#{self.class}#['#{field}']: invalid field name")
     end
 
     ######################################################################

@@ -103,9 +103,15 @@ class Pon::Model
   # Field "foo"
   def foo : T
   def foo? : T?
+  def [](key) : T
+  def []?(key) : T?
+  def []=(key, val)
 
   # Aggregations
   def self.count_by_xxx : Hash(Type, Int64)
+
+  # Misc
+  def self.pluck(fields : Array(String))
 ```
 
 ## API : Module
