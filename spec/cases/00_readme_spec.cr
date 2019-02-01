@@ -16,7 +16,7 @@ module {{adapter.upcase.id}}
 
       field   name : String
       field   time : Time
-      field   code : Code
+      field   code : Code   = Code::OK
     end
     
     it "works" do
@@ -25,10 +25,11 @@ module {{adapter.upcase.id}}
       Job.count                         .should eq(0)
 
       # CRUD
-      job = Job.new(name: "foo", code: Code::OK)
+      job = Job.new(name: "foo")
       job.name                          .should eq("foo")
       job.time?                         .should eq(nil)
       expect_raises(Pon::ValueNotFound) { job.time }
+      job.code                          .should eq(Code::OK)
       job.save                          .should eq(true)
       Job.find(job.id).code.ok?         .should eq(true)
       Job.create!(name: "bar", code: Code::ERR)

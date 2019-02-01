@@ -21,7 +21,7 @@ class Job < Pon::Model
   adapter mysql              # "mysql", "pg", "sqlite"
   field   name : String
   field   time : Time
-  field   code : Code
+  field   code : Code = Code::OK  # default value
 end
 
 Pon::Adapter::Mysql.setting.url = "mysql://root@127.0.0.1:3306/test"
@@ -31,10 +31,11 @@ Job.migrate! # drop and create the table
 Job.count                 # => 0
 
 # CRUD
-job = Job.new(name: "foo", code: Code::OK)
+job = Job.new(name: "foo")
 job.name                  # => "foo"
 job.time?                 # => nil
 job.time                  # raises Pon::ValueNotFound
+job.code                  # => Code::OK
 job.save                  # => true
 Job.find(job.id).code.ok? # => true
 Job.create!(name: "bar", code: Code::ERR)
@@ -127,6 +128,7 @@ Pon.query_logging=(v : Bool) # writes queries into the logger or not
 
 - Adapter Core
   - [x] connect lazily
+  - [x] share same connection between adapters
   - [x] exec plain sql
   - [x] exec prepared statement
   - [x] all
@@ -153,6 +155,7 @@ Pon.query_logging=(v : Bool) # writes queries into the logger or not
   - [ ] callbacks
   - [ ] validations
   - [x] natural keys
+  - [x] default values
 - CRUD
   - [x] create
   - [x] delete, delete_all
@@ -161,6 +164,7 @@ Pon.query_logging=(v : Bool) # writes queries into the logger or not
 - Finder
   - [x] all, count, first
   - [x] pluck (with casting)
+  - [ ] field aliases
 - Aggregations
   - [x] count_by_xxx
 - Relations

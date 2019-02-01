@@ -35,8 +35,12 @@ module Pon::Dsl
     end
   end
 
-  macro field(decl)
-    {% CONTENT_FIELDS[decl.var] = {name: decl.var, type: decl.type} %}
+  macro field(name)
+    {% if name.is_a?(TypeDeclaration) %}
+      {% CONTENT_FIELDS[name.var] = {name: name.var, type: name.type, default: name.value || "nil".id} %}
+    {% else %}
+      {% abort "Pon::Model.field doesn't support " + name.class_name %}
+    {% end %}
   end
 
   macro _finish_dsl
@@ -46,13 +50,13 @@ module Pon::Dsl
     # merge PK and CONTENT_FIELDS into ALL_FIELDS
     #   db: db type
     #   sp: the name of special type that differs between crystal and db
-    {% ALL_FIELDS[primary_name] = {name: primary_name, type: primary_type, db: primary_type, sp: :none } %}
+    {% ALL_FIELDS[primary_name] = {name: primary_name, type: primary_type, db: primary_type, sp: :none, default: "nil".id } %}
     {% for name, h in CONTENT_FIELDS %}
       {% typ = h[:type].resolve %}
       {% enm = (typ < Enum) %}
       {% sp  = enm ? :enum      : ( (typ == Time::Span) ? :span : :none ) %}
       {% db  = enm ? "Int32".id : ( (typ == Time::Span) ? "Time".id : h[:type] ) %}
-      {% ALL_FIELDS[name] = {name: name, type: h[:type], db: db, sp: sp} %}
+      {% ALL_FIELDS[name] = {name: name, type: h[:type], db: db, sp: sp, default: h[:default]} %}
     {% end %}
 
     # Create the properties
@@ -70,9 +74,21 @@ module Pon::Dsl
       {% end %}
 
       def {{name.id}}
-        raise ::Pon::ValueNotFound.new({{@type.name.stringify}} + "#" + {{name.stringify}} + " is nil") if @{{name.id}}.nil?
+        if @{{name.id}}.nil?
+          if {{h[:default]}} != nil
+            return {{h[:default]}}.not_nil!
+          else
+            raise ::Pon::ValueNotFound.new({{@type.name.stringify}} + "#" + {{name.stringify}} + " is nil")
+          end
+        end
         @{{name.id}}.not_nil!
       end
+
+      {% if h[:default] != "nil".id %}
+        def {{name.id}}? : {{h[:type]}}?
+          @{{name.id}} || {{h[:default]}}.not_nil!
+        end
+      {% end %}
     {% end %}
    
     alias Types = {{ (ALL_FIELDS.values.map{|h| h[:type].stringify} + ["Nil"]).sort.join("|").id }}
