@@ -111,8 +111,8 @@ abstract class Pon::Adapter::RDB < Pon::Adapter
       scalar(query).to_s.to_i32
     end
 
-    def all(fields : Array(String), types, rest = nil, **opts)
-      query = select_statement(fields, rest, **opts)
+    def all(fields : Array(String), types, query_string = nil, **opts)
+      query = select_statement(fields, query_string, **opts)
       query_log query, "all"
       query_all query, as: types
     end

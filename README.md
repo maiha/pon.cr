@@ -45,7 +45,7 @@ Job.find(job.id).code.ok? # => true
 
   # CRUD
   def insert(fields, params)
-  def all(fields : Array(String), types, rest = nil, **opts)
+  def all(fields : Array(String), types, condition = nil, **opts)
   def one?(id, fields : Array(String), as types : Tuple)
   def count : Int32
   def delete(key) : Bool
@@ -79,6 +79,7 @@ class Pon::Model
   def self.create : M
   def self.count : Int32
   def self.all : Array(M)
+  def self.all(query_string : String) : Array(M)
   def self.where(condition : String) : Array(M)
   def self.first : M
   def self.first? : M?

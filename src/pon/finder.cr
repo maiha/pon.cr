@@ -5,13 +5,19 @@ module Pon::Finder
       adapter.count
     end
 
-    def self.all(fields : Array(String), types, rest = nil, **opts)
-      adapter.all(fields, types, rest, **opts)
+    def self.all(fields : Array(String), types, query_string = nil, **opts)
+      adapter.all(fields, types, query_string, **opts)
     end
 
-    def self.all(**opts)
-      adapter.all(field_names, {{ db_tuple }}, nil, **opts).map{|t| new(t)}
+    def self.all(query_string : String? = nil, **opts)
+      adapter.all(field_names, {{ db_tuple }}, query_string, **opts).map{|t| new(t)}
     end
+
+    # TODO: condition with parameters
+    # def self.all(condition : String, params : Array(Types), **opts)
+    #   condition = build_condition(condition, param)
+    #   all(condition, **opts)
+    # end
 
     def self.where(condition : String, limit : Int32? = nil)
       all(where: condition, limit: limit)

@@ -27,7 +27,7 @@ require "./spec_helper"
         describe "Model.all" do
           it "returns all records" do
             Job.delete_all
-            now = Time.now
+
             Job.create!(name: 1, code: Code::OK)
             Job.create!(name: 2, code: Code::OK)
             Job.create!(name: 3, code: Code::ERR)
