@@ -170,7 +170,7 @@ module Pon::Dsl
     end
 
     ######################################################################
-    ### Model.new(tuple)
+    ### Instantiate
 
     # called from `DB#query_all`
     # ```

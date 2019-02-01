@@ -28,6 +28,7 @@ module {{adapter.upcase.id}}
       job = Job.new(name: "foo", code: Code::OK)
       job.name                          .should eq("foo")
       job.time?                         .should eq(nil)
+      expect_raises(Pon::ValueNotFound) { job.time }
       job.save                          .should eq(true)
       Job.find(job.id).code.ok?         .should eq(true)
       Job.create!(name: "bar", code: Code::ERR)
@@ -35,6 +36,7 @@ module {{adapter.upcase.id}}
       # Finder
       Job.all.size                      .should eq(2)
       Job.all(where: "code = 200").size .should eq(1)
+      Job.all(["code"]).map(&.name?)    .should eq([nil, nil])
 
       # And more useful features
       Job.pluck(["name"])               .should eq([["foo"], ["bar"]])

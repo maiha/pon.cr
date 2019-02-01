@@ -31,6 +31,9 @@ module Pon
   class RecordInvalid < RecordError
   end
   
+  class RecordLocked < RecordError
+  end
+  
   class RecordNotSaved < RecordError
   end
 

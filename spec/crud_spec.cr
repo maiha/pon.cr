@@ -92,6 +92,7 @@ require "./spec_helper"
 
             job = Job.find(job.id)
             job.new_record?.should be_false
+            job.locked_record?.should be_false
             job.name.should eq("foo")
           end
         end
@@ -107,6 +108,7 @@ require "./spec_helper"
             job = Job.find?(job.id)
             job.should be_a(Job)
             job.try(&.new_record?).should be_false
+            job.try(&.locked_record?).should be_false
             job.try(&.name).should eq("foo")
           end
         end
@@ -115,6 +117,7 @@ require "./spec_helper"
           it "inserts a new record when new_record?" do
             job = Job.new(name: "foo")
             job.new_record?.should be_true
+            job.locked_record?.should be_false
 
             job.id?.should be_a(Nil)
             job.save!
@@ -131,12 +134,26 @@ require "./spec_helper"
             job = Job.find(job_id)
             job.name.should eq("bar")
           end
+
+          it "raises LockedRecord when locked_record" do
+            job_id = Job.create!(name: "foo").id
+
+            job = Job.find(job_id)
+            job.name = "bar"
+            # force locked
+            job.record_locked_by = "for test"
+
+            expect_raises(Pon::RecordLocked) do
+              job.save!
+            end
+          end
         end
 
         describe "Model.create" do
           it "creates a new record" do
             job = Job.create(name: "foo")
             job.new_record?.should be_false
+            job.locked_record?.should be_false
             job.name.should eq("foo")
           end
         end
@@ -145,6 +162,7 @@ require "./spec_helper"
           it "creates a new record" do
             job = Job.create!(name: "foo")
             job.new_record?.should be_false
+            job.locked_record?.should be_false
             job.name.should eq("foo")
           end
         end

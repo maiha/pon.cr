@@ -9,7 +9,7 @@ module Pon::Aggregations
       def self.count_by_{{name}} : Hash({{h[:type]}}, Int64)
 
         _hash = Hash({{h[:type]}}, Int64).new
-        all(["{{name}}", "COUNT(*)"], { {{h[:db]}}?, Int64? }, "GROUP BY {{name}}").each do |raw, cnt|
+        adapter.all(["{{name}}", "COUNT(*)"], { {{h[:db]}}?, Int64? }, "GROUP BY {{name}}").each do |raw, cnt|
           raw || raise ::Pon::Bug.new({{clue}} + " raw is nil")
           cnt || raise ::Pon::Bug.new({{clue}} + " cnt is nil")
 

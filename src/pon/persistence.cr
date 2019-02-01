@@ -22,6 +22,10 @@ module Pon::Persistence
     end
 
     def create_or_update!(*args)
+      if reason = record_locked_by?
+        raise Pon::RecordLocked.new(self)
+      end
+
       return false unless valid?
 
       adapter = self.class.adapter
@@ -131,15 +135,24 @@ module Pon::Persistence
       !(new_record? || destroyed?)
     end
 
-    # Returns true if this object hasn't been saved yet.
-    getter? new_record : Bool = true
+    # The reason why this record is locked.
+    var record_locked_by : String
 
-    # Returns true if this object has been destroyed.
-    getter? destroyed : Bool = false
+    # Returns whether this record is locked or not.
+    def locked_record? : Bool
+      !! record_locked_by?
+    end
+    
+    def self.__partial_loading__(&block) : {{@type.name}}
+      obj = new
+      obj.__partial_loading__
+      yield obj
+      return obj
+    end
 
-    # Returns true if the record is persisted.
-    def persisted?
-      !(new_record? || destroyed?)
+    def __partial_loading__
+      @new_record = false
+      self.record_locked_by = "This instance has been loaded with partial data"
     end
   end
 end

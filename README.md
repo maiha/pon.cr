@@ -34,6 +34,7 @@ Job.count                 # => 0
 job = Job.new(name: "foo", code: Code::OK)
 job.name                  # => "foo"
 job.time?                 # => nil
+job.time                  # raises Pon::ValueNotFound
 job.save                  # => true
 Job.find(job.id).code.ok? # => true
 Job.create!(name: "bar", code: Code::ERR)
@@ -41,6 +42,7 @@ Job.create!(name: "bar", code: Code::ERR)
 # Finder
 Job.all.size                      # => 2
 Job.all(where: "code = 200").size # => 1
+Job.all(["code"]).map(&.name?)    # => [nil, nil]
 
 # And more useful features
 Job.pluck(["name"]) # => [["foo"], ["bar"]]
