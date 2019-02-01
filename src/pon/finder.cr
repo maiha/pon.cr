@@ -5,7 +5,7 @@ module Pon::Finder
       adapter.count
     end
 
-    def self.all(fields : Array(String), types, query_string = nil, **opts)
+    def self.all(fields : Array(String?), types, query_string = nil, **opts)
       adapter.all(fields, types, query_string, **opts)
     end
 

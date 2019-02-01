@@ -13,6 +13,7 @@ class Pon::Model
       include Pon::Serializable
       include Pon::Persistence
       include Pon::Finder
+      include Pon::Pluck
       include Pon::Aggregations
       include Pon::Migrator
     end

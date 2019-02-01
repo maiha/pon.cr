@@ -34,5 +34,9 @@ module Pon::Serializable
       return values
     end
     
+    def self.db_deserialize(field : String, value)
+      Pon::Cast.cast(value, type_for(field))
+    end
+
   end
 end

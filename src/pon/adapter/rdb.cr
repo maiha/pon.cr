@@ -117,6 +117,12 @@ abstract class Pon::Adapter::RDB < Pon::Adapter
       query_all query, as: types
     end
     
+    def all(fields : Array(String?), types, query_string = nil, **opts)
+      query = select_statement(fields, query_string, **opts)
+      query_log query, "all"
+      query_all query, as: types
+    end
+    
     def one?(id, fields : Array(String), as types : Tuple)
       query = select_statement(fields, where: "#{@qp} = ?", limit: 1)
       query_log query, "one?"
@@ -149,7 +155,7 @@ abstract class Pon::Adapter::RDB < Pon::Adapter
       scalar(LAST_VAL).as(Int64)
     end
 
-    protected def select_statement(fields : Array(String), rest : String? = nil, **opts)
+    protected def select_statement(fields : Array(String?), rest : String? = nil, **opts)
       stmt = String.build do |s|
         s << "SELECT "
         s << fields.map { |name| quote_field(name) }.join(", ")
@@ -162,8 +168,25 @@ abstract class Pon::Adapter::RDB < Pon::Adapter
       return underlying_prepared(stmt)
     end
 
-    def quote_field(name : String) : String
+    # same as `select_statement` except fill ALL_FIELD with nil if absent
+    protected def pluck_statement(fields : Array(String), rest : String? = nil, **opts)
+      stmt = String.build do |s|
+        s << "SELECT "
+        
+        s << fields.map { |name| quote_field(name) }.join(", ")
+        s << " FROM #{@qt}"
+        s << " #{rest}" if rest
+        opts.each do |k, v|
+          s << " #{k} #{v}" if v
+        end
+      end
+      return underlying_prepared(stmt)
+    end
+
+    def quote_field(name : String?) : String
       case name
+      when Nil
+        "NULL"
       when /^[a-z0-9_]+$/i
         "#{@qt}.#{quote(name)}"
       else

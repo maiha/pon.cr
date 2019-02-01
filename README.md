@@ -1,6 +1,6 @@
 # pon.cr [![Build Status](https://travis-ci.org/maiha/pon.cr.svg?branch=master)](https://travis-ci.org/maiha/pon.cr)
 
-Maiha's private ORM for [Crystal](http://crystal-lang.org/).
+Maiha's private ORM for [Crystal](https://crystal-lang.org/).
 
 - crystal: 0.27.0
 
@@ -10,11 +10,13 @@ Maiha's private ORM for [Crystal](http://crystal-lang.org/).
 require "pon"
 require "pon/adapter/mysql"  # "mysql", "pg", "sqlite"
 
+# Enum support!
 enum Code
   OK  = 200
   ERR = 500
 end
 
+# Model definition
 class Job < Pon::Model
   adapter mysql              # "mysql", "pg", "sqlite"
   field   name : String
@@ -23,16 +25,26 @@ class Job < Pon::Model
 end
 
 Pon::Adapter::Mysql.setting.url = "mysql://root@127.0.0.1:3306/test"
+
+# Create table
 Job.migrate! # drop and create the table
+Job.count                 # => 0
 
-Job.count # => 0
-
+# CRUD
 job = Job.new(name: "foo", code: Code::OK)
-job.name  # => "foo"
-job.time? # => nil
-job.save  # => true
-
+job.name                  # => "foo"
+job.time?                 # => nil
+job.save                  # => true
 Job.find(job.id).code.ok? # => true
+Job.create!(name: "bar", code: Code::ERR)
+
+# Finder
+Job.all.size                      # => 2
+Job.all(where: "code = 200").size # => 1
+
+# And more useful features
+Job.pluck(["name"]) # => [["foo"], ["bar"]]
+Job.count_by_code   # => {Code::OK => 1, Code::ERR => 1}
 ```
 
 ## API : Adapter
@@ -134,11 +146,13 @@ Pon.query_logging=(v : Bool) # writes queries into the logger or not
   - [ ] validations
   - [x] natural keys
 - CRUD
-  - [x] all, count, first
   - [x] create
   - [x] delete, delete_all
   - [x] find
   - [x] save
+- Finder
+  - [x] all, count, first
+  - [x] pluck (with casting)
 - Aggregations
   - [x] count_by_xxx
 - Relations
@@ -173,7 +187,9 @@ dependencies:
 
 ## Development
 
-TODO: Write development instructions here
+```console
+$ make spec
+```
 
 ## Contributing
 

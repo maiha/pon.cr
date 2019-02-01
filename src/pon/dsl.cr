@@ -89,7 +89,20 @@ module Pon::Dsl
 
     def initialize
     end
-      
+
+    def self.type_for(field : String)
+      {% begin %}
+      case field
+      {% for name, h in ALL_FIELDS %}
+        when "{{name.id}}"
+          {{h[:type]}}
+      {% end %}
+      else
+        raise ArgumentError.new("#{self}.type_for expects field name, but got: #{field.inspect}")
+      end
+       {% end %}
+    end
+    
     def self.from_sql(result : DB::ResultSet) : Hash(String, Types)
       hash = Hash.new(String, Types)
       {% for name, h in ALL_FIELDS %}
