@@ -2,7 +2,7 @@
 
 Maiha's private ORM for [Crystal](https://crystal-lang.org/).
 
-- crystal: 0.27.0
+- crystal: 0.30.0
 
 ## Usage
 
