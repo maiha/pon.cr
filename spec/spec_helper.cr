@@ -35,6 +35,6 @@ module {{adapter.upcase.id}}
   end
 
   Job.migrate!
-  
+
 end
 {% end %}

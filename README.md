@@ -117,6 +117,28 @@ class Pon::Model
   def self.pluck(fields : Array(String))
 ```
 
+## API : Query
+
+```crystal
+class JobName < Pon::Query
+  adapter pg
+  field name : String
+  field size : Int32 = "length(name)"
+
+  from <<-SQL
+    FROM  jobs
+    ORDER BY \{{order}}
+    LIMIT \{{limit}}
+    SQL
+
+  def self.all(limit = 10, order = "name")
+    context.bind(limit: limit, order: order).all
+  end
+end
+
+JobName.all(limit: 2).map(&.name) # => ["bar", "foo"]
+```
+
 ## API : Module
 
 ```crystal
@@ -171,6 +193,10 @@ Pon.query_logging=(v : Bool) # writes queries into the logger or not
   - [ ] belongs_to
   - [ ] has_many
   - [ ] has_many through
+- Query
+  - [x] typed column access
+  - [x] arbitrary select query
+  - [x] prepared statement
 - Misc
   - [ ] bulk insert
   - [ ] upsert
@@ -188,13 +214,13 @@ dependencies:
   # one of following adapter
   mysql:
     github: crystal-lang/crystal-mysql
-    version: ~> 0.4.0
+    version: ~> 0.5.1
   sqlite3:
     github: crystal-lang/crystal-sqlite3
-    version: ~> 0.9.0
+    version: ~> 0.12.0
   pg:
     github: will/crystal-pg
-    version: ~> 0.14.1
+    version: ~> 0.15.0
 ```
 
 ## Development

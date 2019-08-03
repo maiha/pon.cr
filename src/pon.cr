@@ -1,5 +1,6 @@
 # system
 require "logger"
+require "csv"
 
 # shards
 require "db"
