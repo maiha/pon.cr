@@ -127,8 +127,8 @@ class JobName < Pon::Query
 
   from <<-SQL
     FROM  jobs
-    ORDER BY \{{order}}
-    LIMIT \{{limit}}
+    ORDER BY {{order}}
+    LIMIT {{limit}}
     SQL
 
   def self.all(limit = 10, order = "name")
@@ -209,7 +209,7 @@ Add this to your application's `shard.yml`:
 dependencies:
   pon:
     github: maiha/pon.cr
-    version: 0.4.2
+    version: 0.5.0
 
   # one of following adapter
   mysql:
