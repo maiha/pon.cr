@@ -29,7 +29,7 @@ module {{adapter.upcase.id}}
       job.name                          .should eq("foo")
       job.time?                         .should eq(nil)
       expect_raises(Pon::ValueNotFound) { job.time }
-      job.time = Time.now
+      job.time = Pretty.now
       job.code                          .should eq(Code::OK)
       job.save                          .should eq(true)
       Job.find(job.id).code.ok?         .should eq(true)

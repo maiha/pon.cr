@@ -25,6 +25,8 @@ abstract class Pon::Adapter
       end
     end
     return db
+  rescue err : DB::ConnectionRefused
+    raise DB::ConnectionRefused.new(setting.url.to_s)
   end
 
   def self.reset!(setting : Setting) : Nil

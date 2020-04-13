@@ -5,8 +5,8 @@ class Pon::Setting < TOML::Config
   str name
   
   str url
-  int init_pool_size
-  int max_pool_size
+  i32 init_pool_size
+  i32 max_pool_size
 
   str init_connect
 

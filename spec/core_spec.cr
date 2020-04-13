@@ -68,7 +68,7 @@ module {{adapter.upcase.id}}
         job.db_serialize("time").should eq(nil)
         job.db_serialize("code").should eq(nil)
 
-        job = Job.new(name: "http", time: Time.now, code: Code::OK)
+        job = Job.new(name: "http", time: Pretty.now, code: Code::OK)
         job.db_serialize("name").should eq("http")
         job.db_serialize("time").should be_a(Time)
         job.db_serialize("code").should eq(200)

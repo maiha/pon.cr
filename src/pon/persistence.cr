@@ -32,7 +32,7 @@ module Pon::Persistence
       begin
         __run_before_save
         table_name = self.class.table_name
-        now = Time.now.to_utc
+        now = Pretty.now
 
         if (pk = @{{primary_name}}) && !new_record?
           __run_before_update

@@ -12,7 +12,7 @@ abstract class Pon::Adapter::RDB < Pon::Adapter
   abstract def all(fields : Array(String), types, rest = nil, **opts)
   abstract def one?(id, fields : Array(String), as types : Tuple)
   abstract def count : Int32
-  abstract def delete(key) : Bool
+  abstract def delete(key) : Nil
   abstract def delete : Nil
   abstract def truncate : Nil
 

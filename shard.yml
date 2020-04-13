@@ -9,29 +9,27 @@ license: MIT
 dependencies:
   db:
     github: crystal-lang/crystal-db
-    version: ~> 0.5.1
+    version: "0.5.1"
   toml-config:
     github: maiha/toml-config.cr
-    version: ">= 0.4.0"
+    version: ">= 0.6.0"
   wordsmith:
     github: luckyframework/wordsmith
     version: ~> 0.2
   var:
     github: maiha/var.cr
-    version: ">= 1.2.0"
   pretty:
     github: maiha/pretty.cr
-    version: ">= 0.7.3"
 
 development_dependencies:
   mysql:
     github: crystal-lang/crystal-mysql
-    version: ~> 0.5.1
+    version: "0.5.1"
 
   sqlite3:
     github: crystal-lang/crystal-sqlite3
-    version: ~> 0.12.0
+    version: "0.12.0"
 
   pg:
     github: will/crystal-pg
-    version: ~> 0.15.0
+    version: "0.15.0"
