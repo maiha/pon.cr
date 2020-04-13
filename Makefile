@@ -7,12 +7,17 @@ GIT_REV_ID=`(git describe --tags 2>|/dev/null) || (LC_ALL=C date +"%F-%X")`
 
 .SHELLFLAGS = -o pipefail -c
 
+travis: shards test
+
+shards:
+	docker-compose run --rm test shards update
+
 .PHONY : test
 test: check_version_mismatch spec
 
 .PHONY : spec
 spec:
-	docker-compose run --rm crystal crystal spec -v --fail-fast
+	docker-compose run --rm test
 
 .PHONY : check_version_mismatch
 check_version_mismatch: shard.yml README.md

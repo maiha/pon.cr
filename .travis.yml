@@ -4,5 +4,4 @@ services:
   - docker
 
 script:
-  - shards update
-  - make test
+  - make travis

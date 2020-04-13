@@ -1,11 +1,12 @@
 version: '2'
 services:
-  crystal:
+  test:
     build: .
-    command: 'bash -c "sleep 5 && crystal spec"'
+    # command: sh -c './wait-for pg:5432 -t 300 -- crystal spec -v --fail-fast'
+    command: 'bash -c "sleep 10 && crystal spec"'
     volumes:
-      - .:/mnt
-    working_dir: /mnt
+      - .:/v
+    working_dir: /v
     environment:
       PG_URL: 'postgres://postgres:@pg:5432/postgres'
       MYSQL_URL: 'mysql://user:pass@mysql:3306/test'
