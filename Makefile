@@ -1,4 +1,6 @@
 SHELL=/bin/bash
+UID=$(shell id -u)
+export UID
 
 VERSION=
 CURRENT_VERSION=$(shell git tag -l | sort -V | tail -1)
@@ -7,17 +9,20 @@ GIT_REV_ID=`(git describe --tags 2>|/dev/null) || (LC_ALL=C date +"%F-%X")`
 
 .SHELLFLAGS = -o pipefail -c
 
-travis: shards test
+ci: check_version_mismatch docker-up shards spec
+
+docker-up:
+	docker-compose up -d
+
+docker-down:
+	docker-compose down -v --remove-orphans
 
 shards:
-	docker-compose run --rm test shards update
-
-.PHONY : test
-test: check_version_mismatch spec
+	docker-compose exec test shards update -v
 
 .PHONY : spec
 spec:
-	docker-compose run --rm test
+	docker-compose exec test crystal spec -v
 
 .PHONY : check_version_mismatch
 check_version_mismatch: shard.yml README.md

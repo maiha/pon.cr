@@ -1,0 +1,30 @@
+$ make ci
+...
+Finished in 81.43 milliseconds
+0 examples, 0 failures, 0 errors, 0 pending
+Unhandled exception: bind message supplies 1 parameters, but prepared statement "" requires 0 (PQ::PQError)
+  from lib/pg/src/pq/connection.cr:203:7 in 'handle_error'
+  from lib/pg/src/pq/connection.cr:186:7 in 'handle_async_frames'
+  from lib/pg/src/pq/connection.cr:162:7 in 'read'
+  from lib/pg/src/pq/connection.cr:157:7 in 'read'
+  from lib/pg/src/pq/connection.cr:414:31 in 'expect_frame'
+  from lib/pg/src/pq/connection.cr:413:5 in 'expect_frame'
+  from lib/pg/src/pg/statement.cr:19:5 in 'perform_query'
+  from lib/pg/src/pg/statement.cr:35:14 in 'perform_exec'
+  from lib/db/src/db/statement.cr:85:9 in 'perform_exec_and_release'
+  from lib/db/src/db/statement.cr:70:7 in 'exec:args'
+  from lib/db/src/db/pool_statement.cr:19:30 in 'exec:args'
+  from lib/db/src/db/query_methods.cr:275:7 in 'exec'
+  from src/pon/adapter/pg.cr:4:1 in 'exec'
+  from src/pon/adapter/pg.cr:4:1 in 'exec'
+  from spec/spec_helper.cr:20:1 in 'exec'
+  from spec/spec_helper.cr:20:1 in 'drop'
+  from src/pon/migrator.cr:25:7 in 'migrate!'
+  from spec/spec_helper.cr:20:1 in 'migrate!'
+  from spec/spec_helper.cr:20:1 in '__crystal_main'
+  from ../usr/share/crystal/src/crystal/main.cr:105:5 in 'main_user_code'
+  from ../usr/share/crystal/src/crystal/main.cr:91:7 in 'main'
+  from ../usr/share/crystal/src/crystal/main.cr:114:3 in 'main'
+  from ???
+make: *** [Makefile:25: spec] Error 1
+zsh: exit 2     make ci

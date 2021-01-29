@@ -2,20 +2,24 @@ version: '2'
 services:
   test:
     build: .
-    # command: sh -c './wait-for pg:5432 -t 300 -- crystal spec -v --fail-fast'
-    command: 'bash -c "sleep 10 && crystal spec"'
+    tty: true
+    user: "${UID}"
     volumes:
       - .:/v
     working_dir: /v
     environment:
-      PG_URL: 'postgres://postgres:@pg:5432/postgres'
+      PG_URL: 'postgres://postgres:pon@pg:5432/postgres'
       MYSQL_URL: 'mysql://user:pass@mysql:3306/test'
       SQLITE_URL: 'sqlite3:/tmp/test.db'
     depends_on:
       - pg
       - mysql
   pg:
-    image: postgres:9.5
+    image: postgres:12.4
+    command: ["postgres", "-c", "log_statement=all", "-c", "log_destination=stderr"]
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=pon
   mysql:
     image: mysql:5.6
     environment:
