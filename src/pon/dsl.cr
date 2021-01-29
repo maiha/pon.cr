@@ -39,7 +39,7 @@ module Pon::Dsl
     {% if name.is_a?(TypeDeclaration) %}
       {% CONTENT_FIELDS[name.var] = {name: name.var, type: name.type, default: name.value || "nil".id} %}
     {% else %}
-      {% abort "Pon::Model.field doesn't support " + name.class_name %}
+      {% raise "Pon::Model.field doesn't support " + name.class_name %}
     {% end %}
   end
 

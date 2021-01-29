@@ -48,7 +48,9 @@ abstract class Pon::Adapter::RDB < Pon::Adapter
     @qt : String                # quoted table name
     @qp : String                # quoted primary name
 
-    getter table_name, qt, qp
+    getter table_name : String
+    getter qt : String
+    getter qp : String
 
     def initialize(klass, @table_name : String, @primary_name : String, @setting : ::Pon::Setting = ::Pon::Setting.new, @db : ::DB::Database? = nil)
       # bind class setting to default only if default is not set
@@ -92,7 +94,11 @@ abstract class Pon::Adapter::RDB < Pon::Adapter
     def exec(query : String, params = [] of String)
       query = underlying_prepared(query) if params.any?
       query_log "#{query}: #{params}", "exec"
-      database.exec query, params
+      if params.any?
+        database.exec query, args: params
+      else
+        database.exec query
+      end
     end
 
     def transaction(&block) : Nil

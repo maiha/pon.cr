@@ -2,11 +2,14 @@
 
 Maiha's private ORM for [Crystal](https://crystal-lang.org/).
 
-- crystal: 0.30.0
-- db: crystal-db-0.5.1
-- mysql: crystal-mysql-0.5.1
-- sqlite3: crystal-sqlite3-0.12.0
-- pg: will/crystal-pg-0.15.0
+##### tested
+- crystal: 0.35.1
+  - db: crystal-db-0.10.0
+  - mysql: crystal-mysql-0.13.0
+  - sqlite3: crystal-sqlite3-0.18.0
+  - pg: will/crystal-pg-0.23.0
+- mysql:5.6
+- postgres:12.4
 
 ## Usage
 
@@ -218,13 +221,10 @@ dependencies:
   # one of following adapter
   mysql:
     github: crystal-lang/crystal-mysql
-    version: ~> 0.5.1
   sqlite3:
     github: crystal-lang/crystal-sqlite3
-    version: ~> 0.12.0
   pg:
     github: will/crystal-pg
-    version: ~> 0.15.0
 ```
 
 ## Development

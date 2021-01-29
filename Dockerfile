@@ -1,6 +1,2 @@
-FROM crystallang/crystal:0.30.0
-
-RUN apt-get update -qq && apt-get install -y --no-install-recommends libpq-dev libsqlite3-dev libmysqlclient-dev netcat
-
-CMD ["crystal", "--version"]
-
+FROM crystallang/crystal:0.35.1-alpine
+RUN apk add --no-cache libxml2-dev postgresql-dev mariadb-dev sqlite-dev

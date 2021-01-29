@@ -36,7 +36,7 @@ abstract class Pon::Query
     {% if name.is_a?(TypeDeclaration) %}
       {% FIELDS[name.var] = {name: name.var, type: name.type, sql: name.value || name.var} %}
     {% else %}
-      {% abort "Pon::Query.field doesn't support " + name.class_name %}
+      {% raise "Pon::Query.field doesn't support " + name.class_name %}
     {% end %}
   end
 

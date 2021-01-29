@@ -13,6 +13,15 @@ Pon::Adapter::Sqlite.setting.url = ENV["SQLITE_URL"]?
 Pon.logger = Logger.new(File.open("spec.log", "w+"))
 # Pon.query_logging = false
 
+{% if @type.has_constant? "Log" %}
+  Log.setup do |c|
+    level   = Log::Severity::Info
+    level   = Log::Severity::Debug if ENV["PON_DEBUG"]?
+    backend = Log::IOBackend.new
+    c.bind "*", level, backend
+  end
+{% end %}
+
 ADAPTERS = ["mysql","pg","sqlite"]
 
 ######################################################################
