@@ -57,6 +57,17 @@ Job.pluck(["name"]) # => [["foo"], ["bar"]]
 Job.count_by_code   # => {Code::OK => 1, Code::ERR => 1}
 ```
 
+## DataTypes
+
+The following data types are supported (tested).
+* `Bool`
+* `Enum(Int32)`
+* `Int32`
+* `String`
+* `Time`
+
+See defined fields written in [spec/spec_helper.cr](spec/spec_helper.cr).
+
 ## API : Adapter
 
 ```crystal

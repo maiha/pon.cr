@@ -3,6 +3,17 @@ module Pon::Cast
     value
   end
 
+  def cast(value, type : Bool.class)
+    case value
+    when Bool  ; value.as(Bool)
+    when Int32 ; value.to_i32 == 1
+    when Int64 ; value.to_i64 == 1
+    when "t", "true" , "1"; true
+    when "f", "false", "0"; false
+    else       ;  raise ArgumentError.new("cast error: #{type} <= '#{value}'")
+    end
+  end
+
   def cast(value, type : Int32.class)
     case value
     when Int32 ; value.as(Int32)

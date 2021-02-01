@@ -45,5 +45,14 @@ module {{adapter.upcase.id}}
 
   Job.migrate!
 
+  class DataTypes < Pon::Model
+    adapter {{adapter.id}}
+    table_name data_types
+    primary id : Int32
+    field   bool : Bool
+  end
+
+  DataTypes.migrate!
+
 end
 {% end %}
