@@ -3,11 +3,11 @@
 Maiha's private ORM for [Crystal](https://crystal-lang.org/).
 
 ##### tested
-- crystal: 0.35.1
+- crystal: 0.36.1-alpine
   - db: crystal-db-0.10.0
   - mysql: crystal-mysql-0.13.0
   - sqlite3: crystal-sqlite3-0.18.0
-  - pg: will/crystal-pg-0.23.0
+  - pg: will/crystal-pg-0.23.1
 - mysql:5.6
 - postgres:12.4
 
