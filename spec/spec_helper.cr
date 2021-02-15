@@ -1,3 +1,4 @@
+require "log"                   # specify log library first
 require "spec"
 require "../src/pon"
 
@@ -10,17 +11,9 @@ Pon::Adapter::Pg.setting.url = ENV["PG_URL"]?
 require "../src/pon/adapter/sqlite"
 Pon::Adapter::Sqlite.setting.url = ENV["SQLITE_URL"]?
 
-Pon.logger = Logger.new(File.open("spec.log", "w+"))
-# Pon.query_logging = false
-
-{% if @type.has_constant? "Log" %}
-  Log.setup do |c|
-    level   = Log::Severity::Info
-    level   = Log::Severity::Debug if ENV["PON_DEBUG"]?
-    backend = Log::IOBackend.new
-    c.bind "*", level, backend
-  end
-{% end %}
+Pon.query_logging = false
+Pon.log.backend = Log::IOBackend.new(io: File.open("spec.log", "w+"))
+Pon.log.level = :debug
 
 ADAPTERS = ["mysql","pg","sqlite"]
 

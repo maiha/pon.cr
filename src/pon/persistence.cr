@@ -85,7 +85,7 @@ module Pon::Persistence
         return true
       rescue ex : DB::Error
         if message = ex.message
-          Pon.logger.error "Save Exception: #{message}"
+          Pon.error "Save Exception: #{message}"
           errors << Pon::FieldError.new(nil, message)
         end
         raise ex
@@ -105,7 +105,7 @@ module Pon::Persistence
         return true
       rescue ex : DB::Error
         if message = ex.message
-          Pon.logger.error "Destroy Exception: #{message}"
+          Pon.error "Destroy Exception: #{message}"
           errors << Pon::FieldError.new(nil, message)
         end
         return false

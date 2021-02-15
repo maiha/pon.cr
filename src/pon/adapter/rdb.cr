@@ -1,7 +1,6 @@
 # base class for crystal-db
 abstract class Pon::Adapter::RDB < Pon::Adapter
   abstract def table_name : String
-  abstract def logger : Logger
   abstract def exec(query : String, params = [] of String)
   abstract def lastval : Int64
   abstract def scalar(*args)
@@ -207,9 +206,9 @@ abstract class Pon::Adapter::RDB < Pon::Adapter
         return stmt
       when .dollar?
         bind_pos = 0
-        logger.debug "UNDERLYING PREPARED(#{BIND_TYPE}): #{stmt}"
+        Pon.debug "UNDERLYING PREPARED(#{BIND_TYPE}): #{stmt}"
         converted = stmt.gsub(/\?/){ bind_pos += 1; "$#{bind_pos}" }
-        logger.debug "=> #{converted}"
+        Pon.debug "=> #{converted}"
         return converted
       else
         raise Pon::Error.new("Unsupported bind type: #{BIND_TYPE}")

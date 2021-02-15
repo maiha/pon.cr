@@ -9,25 +9,23 @@ GIT_REV_ID=`(git describe --tags 2>|/dev/null) || (LC_ALL=C date +"%F-%X")`
 
 .SHELLFLAGS = -o pipefail -c
 
-ci: check_version_mismatch docker-up shards spec
+.PHONY: ci
+ci: check_version_mismatch up shards wait
+	docker-compose exec crystal crystal spec
 
-docker-up:
+up:
 	docker-compose up -d
 
-docker-down:
+down:
 	docker-compose down -v --remove-orphans
 
-shards:
-	docker-compose exec test shards update
+shards: shard.lock
+shard.lock: shard.yml
+	docker-compose exec crystal shards update
 
-DEBUG=
-VERBOSE=-v
-FAIL_FAST=--fail-fast
-WARNING=--warnings none
-
-.PHONY : spec
-spec:
-	docker-compose exec test crystal spec $(VERBOSE) $(FAIL_FAST) $(WARNING)
+wait:
+	docker-compose exec crystal ./wait-for pg:5432 -t 30
+	docker-compose exec crystal ./wait-for my:3306 -t 30
 
 .PHONY : check_version_mismatch
 check_version_mismatch: shard.yml README.md

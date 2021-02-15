@@ -1,5 +1,4 @@
 # system
-require "logger"
 require "csv"
 
 # shards

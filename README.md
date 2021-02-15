@@ -157,11 +157,18 @@ end
 JobName.all(limit: 2).map(&.name) # => ["bar", "foo"]
 ```
 
-## API : Module
+## Logging
 
 ```crystal
-Pon.logger=(v : Logger)      # logger
-Pon.query_logging=(v : Bool) # writes queries into the logger or not
+Pon.query_logging=(v : Bool) # writes queries into the logger or not (default: true)
+Pon.query_logging?           # => true
+
+# when Log is enabled
+Pon.logger=(v : Logger)      # replace Logger instance
+
+# when Logger is enabled
+Pon.log.backend = Log::IOBackend.new(io: File.open("sql.log", "w+"))
+Pon.log.level = :debug
 ```
 
 ## Roadmap
