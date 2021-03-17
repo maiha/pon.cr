@@ -91,9 +91,9 @@ abstract class Pon::Adapter::RDB < Pon::Adapter
 
     # NOTE: all "?" appeared in query part will be replaced when params exist
     def exec(query : String, params = [] of String)
-      query = underlying_prepared(query) if params.any?
+      query = underlying_prepared(query) if !params.empty?
       query_log "#{query}: #{params}", "exec"
-      if params.any?
+      if !params.empty?
         database.exec query, args: params
       else
         database.exec query

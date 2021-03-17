@@ -132,7 +132,13 @@ module Pon::Dsl
     def set_attributes(args : Hash) : {{@type}}
       @new_record = true
       {% for name, h in ALL_FIELDS %}
-        _{{name.id}} = args["{{name}}"]? || args[:{{name.id}}]? || nil
+        if args.has_key?("{{name}}")
+          _{{name.id}} = args["{{name}}"]
+        elsif args.has_key?(:{{name.id}})
+          _{{name.id}} = args[:{{name.id}}]
+        else
+          _{{name.id}} = nil
+        end
         self.{{name.id}} = Pon::Cast.cast(_{{name.id}}, {{h[:type]}})
       {% end %}
       return self
