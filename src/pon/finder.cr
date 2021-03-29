@@ -28,9 +28,9 @@ module Pon::Finder
 
       adapter.all(masked, {{db_tuple}}, query_string, **opts).map{|tuple|
         __partial_loading__ do |obj|
-          indexes.map{|i| tuple[i]}.each_with_index do |raw, i|
-            field = fields[i]
-            value = db_deserialize(field, raw)
+          indexes.each do |i|
+            field = field_names[i]
+            value = db_deserialize(field, tuple[i])
             obj[field] = value
           end
         end
