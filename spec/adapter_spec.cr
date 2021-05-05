@@ -41,6 +41,20 @@ end
 
 {% for adapter in ADAPTERS %}
 module {{adapter.upcase.id}}
+  describe "connection pool" do
+    it "max_pool_size is 5 in default" do
+      stats = Job.adapter.database.pool.stats
+      stats.max_connections.should eq(5)
+    end
+
+    it "max_pool_size can be overriden by setting" do
+      Pon::Adapter::{{adapter.capitalize.id}}.setting.max_pool_size = 3
+      Pon::Adapter.reset!
+      stats = Job.adapter.database.pool.stats
+      stats.max_connections.should eq(3)
+    end
+  end
+
   describe "[{{adapter.upcase.id}}](ODBC)" do
     describe "#databases" do
       it "returns database names as Array(String)" do

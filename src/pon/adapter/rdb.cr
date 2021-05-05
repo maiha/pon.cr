@@ -51,11 +51,10 @@ abstract class Pon::Adapter::RDB < Pon::Adapter
     getter qt : String
     getter qp : String
 
-    def initialize(klass, @table_name : String, @primary_name : String, @setting : ::Pon::Setting = ::Pon::Setting.new, @db : ::DB::Database? = nil)
-      # bind class setting to default only if default is not set
-      if @setting.default? == nil
-        @setting.default = self.class.setting
-      end
+    @setting : ::Pon::Setting
+    
+    def initialize(klass, @table_name : String, @primary_name : String, setting : ::Pon::Setting? = nil)
+      @setting = setting || self.class.setting
 
       @qt = quote(@table_name)
       @qp = quote(@primary_name)
@@ -65,16 +64,11 @@ abstract class Pon::Adapter::RDB < Pon::Adapter
     # Querying each time accessing without caching slightly degrades performance,
     # but this mechanism is required when resetting shared connections.
     def database : ::DB::Database
-      @db || Pon::Adapter.database(@setting)
+      Pon::Adapter.database(@setting)
     end
 
     def reset! : Nil
-      if db = @db
-        db.close
-        @db = Pon::Adapter.build_database(@setting)
-      else
-        Pon::Adapter.reset!(@setting)
-      end
+      Pon::Adapter.reset!(@setting)
     end
     
     ### ODBC

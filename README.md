@@ -157,6 +157,20 @@ end
 JobName.all(limit: 2).map(&.name) # => ["bar", "foo"]
 ```
 
+## Connection Pool
+
+The `Adapter.database` is pooled because it uses `DB::Database`. The default `max_pool_size` is 5.
+It can be overridden by `Setting` and `reset!`.
+
+```crystal
+Job.adapter.database.pool.stats.max_connections # => 5
+
+Pon::Adapter::Pg.setting.max_pool_size = 3
+Pon::Adapter.reset!
+
+Job.adapter.database.pool.stats.max_connections # => 3
+```
+
 ## Logging
 
 ```crystal
