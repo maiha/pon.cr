@@ -3,12 +3,12 @@ abstract class Pon::Adapter::RDB < Pon::Adapter
   abstract def table_name : String
   abstract def exec(query : String, params = [] of String)
   abstract def lastval : Int64
-  abstract def scalar(*args)
+  abstract def scalar(*args, **options)
   abstract def transaction(&block) : Nil
   abstract def reset! : Nil
 
   abstract def insert(fields, params)
-  abstract def all(fields : Array(String), types, rest = nil, **opts)
+  abstract def all(fields : Array(String), types, query_string = nil, **opts)
   abstract def one?(id, fields : Array(String), as types : Tuple)
   abstract def count : Int32
   abstract def delete(key) : Nil
@@ -140,8 +140,8 @@ abstract class Pon::Adapter::RDB < Pon::Adapter
       exec "DELETE FROM #{@qt}"
     end
 
-    def delete(value) : Nil
-      exec "DELETE FROM #{@qt} WHERE #{@qp} = ?", [value]
+    def delete(key) : Nil
+      exec "DELETE FROM #{@qt} WHERE #{@qp} = ?", [key]
     end
     
     def insert(fields, params)

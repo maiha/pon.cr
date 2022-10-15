@@ -18,8 +18,13 @@ up:
 down:
 	docker compose down -v --remove-orphans
 
+.PHONY : rebuild
+rebuild:
+	docker compose build --no-cache
+
 .PHONY: spec
 spec:
+	docker compose exec crystal crystal --version
 	docker compose exec crystal crystal spec $(O)
 
 shards: shard.lock

@@ -1,2 +1,2 @@
-FROM crystallang/crystal:0.36.1-alpine
+FROM crystallang/crystal:1.6.0-alpine
 RUN apk add --no-cache postgresql-dev mariadb-dev sqlite-dev
