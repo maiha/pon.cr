@@ -13,22 +13,22 @@ GIT_REV_ID=`(git describe --tags 2>|/dev/null) || (LC_ALL=C date +"%F-%X")`
 ci: check_version_mismatch up shards wait spec
 
 up:
-	docker-compose up -d
+	docker compose up -d
 
 down:
-	docker-compose down -v --remove-orphans
+	docker compose down -v --remove-orphans
 
 .PHONY: spec
 spec:
-	docker-compose exec crystal crystal spec $(O)
+	docker compose exec crystal crystal spec $(O)
 
 shards: shard.lock
 shard.lock: shard.yml
-	docker-compose exec crystal shards update
+	docker compose exec crystal shards update
 
 wait:
-	docker-compose exec crystal ./wait-for pg:5432 -t 30
-	docker-compose exec crystal ./wait-for my:3306 -t 30
+	docker compose exec crystal ./wait-for pg:5432 -t 30
+	docker compose exec crystal ./wait-for my:3306 -t 30
 
 .PHONY : check_version_mismatch
 check_version_mismatch: shard.yml README.md
