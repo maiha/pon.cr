@@ -3,8 +3,8 @@ UID=$(shell id -u)
 export UID
 
 VERSION=
-CURRENT_VERSION=$(shell git tag -l | sort -V | tail -1)
-GUESSED_VERSION=$(shell git tag -l | sort -V | tail -1 | awk 'BEGIN { FS="." } { $$3++; } { printf "%d.%d.%d", $$1, $$2, $$3 }')
+CURRENT_VERSION=$(shell git tag -l | sort -V | tail -1 | sed -e 's/^v//')
+GUESSED_VERSION=$(shell git tag -l | sort -V | tail -1 | sed -e 's/^v//' | awk 'BEGIN { FS="." } { $$3++; } { printf "%d.%d.%d", $$1, $$2, $$3 }')
 GIT_REV_ID=`(git describe --tags 2>|/dev/null) || (LC_ALL=C date +"%F-%X")`
 
 .SHELLFLAGS = -o pipefail -c

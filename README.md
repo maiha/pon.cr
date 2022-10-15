@@ -248,7 +248,7 @@ Add this to your application's `shard.yml`:
 dependencies:
   pon:
     github: maiha/pon.cr
-    version: 0.9.1
+    version: 1.6.0
 
   # one of following adapter
   mysql:
